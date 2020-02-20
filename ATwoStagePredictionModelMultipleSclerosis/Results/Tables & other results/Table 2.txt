@@ -1,0 +1,32 @@
+[1] "LASSO Model"
+                               Variables Coefficients
+1                              Intercept      -0.4424
+2                                    Age      -0.0013
+3                        Baseline Weight      -0.0002
+4                          Baseline EDSS       0.0963
+5  No. of relapses 1 year prior to study       0.2971
+6               Prior MS Treatment group       0.0241
+7                          REGION: India       0.0000
+8                  REGION: North America       0.0000
+9                            REGION: ROW       0.0000
+10                REGION: Western Europe       0.2374
+11                    Baseline Gd volume       0.0001
+12                    Baseline SF-36 PCS      -0.0120
+13  Baseline Actual Distance Walked >500      -0.0746
+[1] "Pre-Specified Model"
+                               Variables Coefficients
+1                              Intercept      -0.8656
+2                                    Age      -0.0181
+3                   Sex (male vs female)      -0.1379
+4                          Baseline EDSS       0.1683
+5          Years Since Onset of Symptoms       0.0587
+6             Ethnicity (white vs other)      -0.0142
+7  No. of relapses 1 year prior to study       0.5963
+8         Months since pre-study relapse      -0.0126
+9   Prior MS Treatment group (yes vs no)       0.1901
+10                                 T25FW      -0.1718
+11                                  9HPT       0.3011
+12                               PASAT-3       0.0029
+13                              VFT 2.5%      -0.0010
+14                    Baseline SF-36 MCS      -0.0195
+15                    Baseline SF-36 PCS       0.0036

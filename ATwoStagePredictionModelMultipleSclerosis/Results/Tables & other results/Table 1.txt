@@ -1,0 +1,34 @@
+[1] "AFFIRM study"
+  Number of randomized patients Number of patients with relapse of MS in two years, (%)  Mean Age (sd) Female N (%)
+1                           939                                             359 ( 38.2 )    36 ( 8.3 )   657 ( 70 )
+2                           627                                             183 ( 29.2 )          <NA>         <NA>
+3                           312                                             176 ( 56.4 )          <NA>         <NA>
+  Male N (%) Mean EDSS (sd) Median number of relapses one year prior to study (min,max)
+1 282 ( 30 )    2.3 ( 1.2 )                                               1 ( 0 ,  12 )
+2       <NA>           <NA>                                                        <NA>
+3       <NA>           <NA>                                                        <NA>
+[1] "CONFIRM study"
+  Number of randomized patients Number of patients with relapse of MS in two years, (%)  Mean Age (sd) Female N (%)
+1                          1417                                             451 ( 31.8 )  37.3 ( 9.3 ) 993 ( 70.1 )
+2                           703                                             185 ( 26.3 )          <NA>         <NA>
+3                           351                                             117 ( 33.3 )          <NA>         <NA>
+4                           363                                               149 ( 41 )          <NA>         <NA>
+    Male N (%) Mean EDSS (sd) Median number of relapses one year prior to study (min,max)
+1 424 ( 29.9 )    2.6 ( 1.2 )                                                1 ( 0 ,  8 )
+2         <NA>           <NA>                                                        <NA>
+3         <NA>           <NA>                                                        <NA>
+4         <NA>           <NA>                                                        <NA>
+[1] "DEFINE study"
+  Number of randomized patients Number of patients with relapse of MS in two years, (%)  Mean Age (sd) Female N (%)
+1                          1234                                             394 ( 31.9 )    38.5 ( 9 ) 908 ( 73.6 )
+2                           826                                             212 ( 25.7 )          <NA>         <NA>
+3                           408                                             182 ( 44.6 )          <NA>         <NA>
+    Male N (%) Mean EDSS (sd) Median number of relapses one year prior to study (min,max)
+1 326 ( 26.4 )    2.4 ( 1.2 )                                                1 ( 0 ,  6 )
+2         <NA>           <NA>                                                        <NA>
+3         <NA>           <NA>                                                        <NA>
+[1] "Placebo single-arm study"
+     Number of randomized patients Number of patients with relapse of MS in two years, (%)  Mean Age (sd)  
+[1,] "1083"                        "801 ( 74 )"                                             "41.2 ( 10.3 )"
+     Female N (%)   Male N (%)     Mean EDSS (sd) Median number of relapses one year prior to study (min,max)
+[1,] "752 ( 69.4 )" "331 ( 30.6 )" NA             NA                                                         

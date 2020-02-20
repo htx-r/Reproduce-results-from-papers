@@ -1,0 +1,3 @@
+                                            discrimination calibration
+LASSO model                                      0.6075004    1.539087
+Pellggrini model with PMLE shrinkage method      0.6217725    1.047941

@@ -1,0 +1,12 @@
+The EPV of the LASSO model is 16.48889
+The needed sample size for the LASSO model is           Samp_size Shrinkage Parameter       Rsq Max_Rsq   EPP
+Criteria 1      3456     0.900        45 0.1098885    0.73 28.49
+Criteria 2      1143     0.751        45 0.1098885    0.73  9.42
+Criteria 3       359     0.900        45 0.1098885    0.73  2.96
+Final           3456     0.900        45 0.1098885    0.73 28.49
+The EPV of the PreSpecified model is 53
+The needed sample size for the PreSpecified model is           Samp_size Shrinkage Parameter       Rsq Max_Rsq   EPP
+Criteria 1      1076     0.900        14 0.1098885    0.73 28.51
+Criteria 2       356     0.751        14 0.1098885    0.73  9.43
+Criteria 3       359     0.900        14 0.1098885    0.73  9.51
+Final           1076     0.900        14 0.1098885    0.73 28.51
