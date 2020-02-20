@@ -10,8 +10,8 @@
 ###load the needed libraries
 library(devtools)
 install_github("htx-r/CleaningData",force=TRUE)
-install_github("htx-r/Reproduce-results-from-papers/ATwoStagePredictionModelMultipleSclerosis/", force = TRUE)
-library(ATwoStagePredictionModelMultipleSclerosis)
+install_github("htx-r/NMAPredictionsRiskModel", force = TRUE)
+library(NMAPredictionsRiskModel)
 library(CleaningData)
 library(R2jags)
 library(dplyr)
