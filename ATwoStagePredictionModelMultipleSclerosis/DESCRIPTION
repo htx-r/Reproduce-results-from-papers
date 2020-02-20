@@ -1,11 +1,14 @@
 Package: ATwoStagePredictionModelMultipleSclerosis
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A two-stage prediction model for heterogeneous effects of many treatment options: application to drugs for Multiple Sclerosis
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: UTF-8
-LazyData: true
+Author: Konstantina Chalkou, Ewout Steyerberg, Matthias Egger, Andrea Manca, Fabio Pellegrini, Georgia Salanti
+Maintainer: The package maintainer <konstantina.chalkou@ispm.unibe.ch>
+Description: A model to estimate the benefit of alternative treatment options for individual patients. 
+In details, it is a two-stage prediction model for heterogeneous treatment effects.
+In a first stage, we develop a prognostic model and we predict the baseline risk of the outcome. 
+In the second stage, we use this baseline risk score from the first stage as a single prognostic factor and effect modifier in a network meta-regression model. 
+We apply the approach to a network meta-analysis of three randomized clinical trials comparing the relapse rate in Natalizumab, Glatiramer Acetate and Dimethyl Fumarate 
+including 3590 patients diagnosed with relapsing-remitting multiple sclerosis. We find that the baseline risk score modifies the relative and absolute treatment effects. 
+Several patient characteristics such as age and disability status impact on the baseline risk of relapse, and this in turn moderates the benefit that may be expected for each of the treatments.  
+
