@@ -7,8 +7,8 @@
 ########################################## FOR LASSO MODEL   ######################################
 ###predicted risk= expit(logit p risk)
 expit<-function(x) {exp(x)/(1+exp(x))}
-p<-IPDNMRJAGSmodelLASSO$BUGSoutput$mean$logitp
-p<-expit(IPDNMRJAGSmodelLASSO$BUGSoutput$mean$logitp)
+p<-IPDNMRJAGSresultsLASSO$BUGSoutput$mean$logitp
+p<-expit(IPDNMRJAGSresultsLASSO$BUGSoutput$mean$logitp)
 
 ####preperation for the graph
 ###For Dymethyl fumarate- Risk & propability to relapse
@@ -52,8 +52,8 @@ IPDplotLASSO
 
 ###predicted risk= expit(logit p risk)
 expit<-function(x) {exp(x)/(1+exp(x))}
-p<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$mean$logitp
-p<-expit(IPDNMRJAGSmodelPreSpecified$BUGSoutput$mean$logitp)
+p<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$mean$logitp
+p<-expit(IPDNMRJAGSresultsPreSpecified$BUGSoutput$mean$logitp)
 
 ####preperation for the graph
 ###For Dymethyl fumarate- Risk & propability to relapse
@@ -95,7 +95,7 @@ IPDplotPreSpecified<-IPDplotPreSpecified+ xlab("Baseline risk") + ylab("Predicte
 
 ##################### LASSO model ################################
 
-pl<-IPDNMRJAGSmodelLASSO$BUGSoutput$mean$logitp
+pl<-IPDNMRJAGSresultsLASSO$BUGSoutput$mean$logitp
 
 ####preperation for the graph
 ###For Dymethyl fumarate- Risk & propability to relapse
@@ -138,7 +138,7 @@ IPDplotLASSO_OR
 ################################# For PreSpecified model #################################################
 
 ###predicted risk= expit(logit p risk)
-pf<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$mean$logitp
+pf<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$mean$logitp
 
 ####preperation for the graph
 ###For Dymethyl fumarate- Risk & propability to relapse
@@ -209,7 +209,7 @@ mean2highf<- summary(GraphdataF$prelapse[which(GraphdataF$Risknew>0.5 & Graphdat
 mean3highf<- summary(GraphdataF$prelapse[which(GraphdataF$Risknew>0.5 & GraphdataF$Risknew<=0.725  & GraphdataF$Treatment=="Natalizumab")])[4]*100
 
 PreSpecifiedtable<-data.frame("Average predicted relapse"=c(mean1f, mean2f, mean3f), "Low-isk patients' (<30%) predicted relapse"=c(mean1lowf,mean2lowf,mean3lowf)
-                       , "High-isk patients' (>50%) predicted relapse"=c(mean1highf,mean2highf,mean3highf))
+                              , "High-isk patients' (>50%) predicted relapse"=c(mean1highf,mean2highf,mean3highf))
 names(PreSpecifiedtable)<-c("Average predicted relapse %","Low-isk patients' (<30%) predicted relapse %","High-isk patients' (>50%) predicted relapse %")
 rownames(PreSpecifiedtable)<-c("Dymethyl fumarate","Glatiramer acetate","Natalizumab")
 
@@ -231,7 +231,7 @@ mean2highOR<- summary(GraphdataL_OR$OR[which(GraphdataL_OR$Risknew>0.5 & Graphda
 mean3highOR<- summary(GraphdataL_OR$OR[which(GraphdataL_OR$Risknew>0.5 & GraphdataL_OR$Risknew<=0.616 & GraphdataL_OR$Comparison=="Natalizumab vs Placebo")])[4]
 
 LASSOtableOR<-data.frame("Average OR "=c(mean1OR, mean2OR, mean3OR), "Low-isk patients' (<30%) mean OR"=c(mean1lowOR,mean2lowOR,mean3lowOR)
-                       , "High-isk patients' (>50%) predicted relapse "=c(mean1highOR,mean2highOR,mean3highOR))
+                         , "High-isk patients' (>50%) predicted relapse "=c(mean1highOR,mean2highOR,mean3highOR))
 names(LASSOtableOR)<-c("Average OR","Low-isk patients' (<30%) OR","High-isk patients' (>50%) OR ")
 rownames(LASSOtableOR)<-c("Dymethyl fumarate","Glatiramer acetate","Natalizumab")
 
@@ -249,7 +249,7 @@ mean2highORF<- summary(GraphdataF_OR$OR[which(GraphdataF_OR$Risknew>0.5 & Graphd
 mean3highORF<- summary(GraphdataF_OR$OR[which(GraphdataF_OR$Risknew>0.5 & GraphdataF_OR$Risknew<=0.725 & GraphdataF_OR$Comparison=="Natalizumab vs Placebo")])[4]
 
 PreSpecifiedtableOR<-data.frame("Average OR "=c(mean1ORF, mean2ORF, mean3ORF), "Low-isk patients' (<30%) mean OR"=c(mean1lowORF,mean2lowORF,mean3lowORF)
-                         , "High-isk patients' (>50%) predicted relapse "=c(mean1highORF,mean2highORF,mean3highORF))
+                                , "High-isk patients' (>50%) predicted relapse "=c(mean1highORF,mean2highORF,mean3highORF))
 names(PreSpecifiedtableOR)<-c("Average OR","Low-isk patients' (<30%) OR","High-isk patients' (>50%) OR ")
 rownames(PreSpecifiedtableOR)<-c("Dymethyl fumarate","Glatiramer acetate","Natalizumab")
 

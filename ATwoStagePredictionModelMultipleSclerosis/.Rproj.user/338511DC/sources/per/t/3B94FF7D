@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582734503516.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "640336906",
+    "id" : "3B94FF7D",
+    "lastKnownWriteTime" : 1582734798,
+    "last_content_update" : 1582734798287,
+    "path" : "C:/Users/kc19o338/Desktop/Real world predictions project/Reproduce-results-from-papers/ATwoStagePredictionModelMultipleSclerosis/MASTER.R",
+    "project_path" : "MASTER.R",
+    "properties" : {
+        "cursorPosition" : "161,0",
+        "scrollLine" : "143"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

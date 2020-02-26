@@ -9,25 +9,25 @@
 #For AFFIRM study:
 
 AFFIRM_T<-as.data.frame(cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]),
-paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1),]), "(",
-round((nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,1), ")" )
-, paste(round(mean(MSrelapse$AGE[which(MSrelapse$STUDYID=="AFFIRM")]),1), "(", round(sd((MSrelapse$AGE[which(MSrelapse$STUDYID=="AFFIRM")])),1), ")")
- , paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[1], "(", round(
-   (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[1]/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,
-   1),
-   ")"),  paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[2], "(", round(
-     (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[2]/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,
-     1),
-     ")"), paste(round(mean(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="AFFIRM")]),1), "(", round(sd(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="AFFIRM")]),1), ")"),
-paste(round(median(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]),0), "(",
-                 exp(min(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]))-1, ", ",
-                 exp(max(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]))-1, ")")
+                              paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1),]), "(",
+                                    round((nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,1), ")" )
+                              , paste(round(mean(MSrelapse$AGE[which(MSrelapse$STUDYID=="AFFIRM")]),1), "(", round(sd((MSrelapse$AGE[which(MSrelapse$STUDYID=="AFFIRM")])),1), ")")
+                              , paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[1], "(", round(
+                                (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[1]/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,
+                                1),
+                                ")"),  paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[2], "(", round(
+                                  (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="AFFIRM")])[2]/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"),]))*100,
+                                  1),
+                                  ")"), paste(round(mean(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="AFFIRM")]),1), "(", round(sd(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="AFFIRM")]),1), ")"),
+                              paste(round(median(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]),0), "(",
+                                    exp(min(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]))-1, ", ",
+                                    exp(max(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="AFFIRM")]))-1, ")")
 ))
 
 
 AFFIRM_N<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$TRT01A=="Natalizumab"),]),
-      paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Natalizumab"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Natalizumab"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"  & MSrelapse$TRT01A=="Natalizumab"),]))*100,1) ,")")
-      ,NA,NA,NA,NA,NA)
+                paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Natalizumab"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Natalizumab"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM"  & MSrelapse$TRT01A=="Natalizumab"),]))*100,1) ,")")
+                ,NA,NA,NA,NA,NA)
 
 
 AFFIRM_P<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="AFFIRM" & MSrelapse$TRT01A=="Placebo"),]),
@@ -41,32 +41,32 @@ colnames(AFFIRM)<-c("Number of randomized patients", "Number of patients with re
 #For CONFIRM study:
 
 CONFIRM_T<-as.data.frame(cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]),
-                              paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1),]), "(",
-                                    round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,1), ")" )
-                              , paste(round(mean(MSrelapse$AGE[which(MSrelapse$STUDYID=="CONFIRM")]),1), "(", round(sd((MSrelapse$AGE[which(MSrelapse$STUDYID=="CONFIRM")])),1), ")")
-                              , paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[1], "(", round(
-                                (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[1]/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,
-                                1),
-                                ")"),  paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[2], "(", round(
-                                  (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[2]/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,
-                                  1),
-                                  ")"), paste(round(mean(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="CONFIRM")]),1), "(", round(sd(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="CONFIRM")]),1), ")"),
-                              paste(round(median(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm = T),0), "(",
-                                    exp(min(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm=T))-1, ", ",
-                                    exp(max(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm=T))-1, ")")
+                               paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1),]), "(",
+                                     round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,1), ")" )
+                               , paste(round(mean(MSrelapse$AGE[which(MSrelapse$STUDYID=="CONFIRM")]),1), "(", round(sd((MSrelapse$AGE[which(MSrelapse$STUDYID=="CONFIRM")])),1), ")")
+                               , paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[1], "(", round(
+                                 (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[1]/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,
+                                 1),
+                                 ")"),  paste(table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[2], "(", round(
+                                   (table(MSrelapse$SEX[which(MSrelapse$STUDYID=="CONFIRM")])[2]/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"),]))*100,
+                                   1),
+                                   ")"), paste(round(mean(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="CONFIRM")]),1), "(", round(sd(MSrelapse$EDSSBL[which(MSrelapse$STUDYID=="CONFIRM")]),1), ")"),
+                               paste(round(median(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm = T),0), "(",
+                                     exp(min(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm=T))-1, ", ",
+                                     exp(max(MSrelapse$RLPS1YR[which(MSrelapse$STUDYID=="CONFIRM")], na.rm=T))-1, ")")
 ))
 CONFIRM_GA<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$TRT01A=="Glatiramer acetate"),]),
                   paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Glatiramer acetate"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Glatiramer acetate"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"  & MSrelapse$TRT01A=="Glatiramer acetate"),]))*100,1) ,")")
                   ,NA,NA,NA,NA,NA)
 
 CONFIRM_DF<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$TRT01A=="Dimethyl fumarate"),]),
-                paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"  & MSrelapse$TRT01A=="Dimethyl fumarate"),]))*100,1) ,")")
-                ,NA,NA,NA,NA,NA)
+                  paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"  & MSrelapse$TRT01A=="Dimethyl fumarate"),]))*100,1) ,")")
+                  ,NA,NA,NA,NA,NA)
 
 
 CONFIRM_P<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$TRT01A=="Placebo"),]),
-                paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Placebo"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Placebo"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"  & MSrelapse$TRT01A=="Placebo"),]))*100,1) ,")")
-                ,NA,NA,NA,NA,NA)
+                 paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Placebo"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Placebo"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="CONFIRM"  & MSrelapse$TRT01A=="Placebo"),]))*100,1) ,")")
+                 ,NA,NA,NA,NA,NA)
 
 CONFIRM<-as.data.frame(rbind(CONFIRM_T,CONFIRM_DF,CONFIRM_GA,CONFIRM_P))
 
@@ -92,8 +92,8 @@ DEFINE_T<-as.data.frame(cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE"),
 
 
 DEFINE_DF<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$TRT01A=="Dimethyl fumarate"),]),
-                paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE"  & MSrelapse$TRT01A=="Dimethyl fumarate"),]))*100,1) ,")")
-                ,NA,NA,NA,NA,NA)
+                 paste(nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),]), "(",round((nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$RELAPSE2year==1 & MSrelapse$TRT01A=="Dimethyl fumarate"),])/nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE"  & MSrelapse$TRT01A=="Dimethyl fumarate"),]))*100,1) ,")")
+                 ,NA,NA,NA,NA,NA)
 
 
 DEFINE_P<-cbind(nrow(MSrelapse[which(MSrelapse$STUDYID=="DEFINE" & MSrelapse$TRT01A=="Placebo"),]),
@@ -107,19 +107,19 @@ colnames(DEFINE)<-c("Number of randomized patients", "Number of patients with re
 #For Placebo study
 
 Placebo<-cbind(nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]),
-      paste(nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year) & PlaceboArms$Relapse2year==1),]), "(",
-            round((nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year) & PlaceboArms$Relapse2year==1),])/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,1), ")"
-                ),
-      paste(round(mean(PlaceboArms$AGE[which(!is.na(PlaceboArms$Relapse2year))], na.rm=T),1), "(", round(sd((PlaceboArms$AGE[which(!is.na(PlaceboArms$Relapse2year))]), na.rm = T),1), ")"),
-      paste(table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[1], "(", round(
-        (table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[1]/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,
-        1),
-        ")"),
+               paste(nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year) & PlaceboArms$Relapse2year==1),]), "(",
+                     round((nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year) & PlaceboArms$Relapse2year==1),])/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,1), ")"
+               ),
+               paste(round(mean(PlaceboArms$AGE[which(!is.na(PlaceboArms$Relapse2year))], na.rm=T),1), "(", round(sd((PlaceboArms$AGE[which(!is.na(PlaceboArms$Relapse2year))]), na.rm = T),1), ")"),
+               paste(table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[1], "(", round(
+                 (table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[1]/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,
+                 1),
+                 ")"),
 
-      paste(table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[2], "(", round(
-        (table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[2]/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,
-        1),
-        ")"), NA, NA
+               paste(table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[2], "(", round(
+                 (table(PlaceboArms$SEX[which(!is.na(PlaceboArms$Relapse2year))])[2]/nrow(PlaceboArms[which(!is.na(PlaceboArms$Relapse2year)),]))*100,
+                 1),
+                 ")"), NA, NA
 )
 
 
@@ -162,13 +162,13 @@ Table_PreSpecifiedModel
 
 
 #### Table 3
-gamma_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[9,]
-deltaDF_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[5,]
-deltaGA_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[6,]
-deltaN_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[7,]
-gammaDF_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[10,]
-gammaGA_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[11,]
-gammaN_LASSO<-IPDNMRJAGSmodelLASSO$BUGSoutput$summary[12,]
+gamma_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[9,]
+deltaDF_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[5,]
+deltaGA_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[6,]
+deltaN_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[7,]
+gammaDF_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[10,]
+gammaGA_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[11,]
+gammaN_LASSO<-IPDNMRJAGSresultsLASSO$BUGSoutput$summary[12,]
 
 
 LASSOIPDNMR_Table<-rbind(gamma_LASSO,deltaDF_LASSO,deltaGA_LASSO,deltaN_LASSO,gammaDF_LASSO,gammaGA_LASSO,gammaN_LASSO)
@@ -186,13 +186,13 @@ todrop<-c(1,2,3)
 LASSOIPDNMR_Table<-LASSOIPDNMR_Table[,-todrop]
 LASSOIPDNMR_Table<-as.data.frame(LASSOIPDNMR_Table)
 
-gamma_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[9,]
-deltaDF_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[5,]
-deltaGA_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[6,]
-deltaN_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[7,]
-gammaDF_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[10,]
-gammaGA_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[11,]
-gammaN_Prespecified<-IPDNMRJAGSmodelPreSpecified$BUGSoutput$summary[12,]
+gamma_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[9,]
+deltaDF_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[5,]
+deltaGA_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[6,]
+deltaN_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[7,]
+gammaDF_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[10,]
+gammaGA_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[11,]
+gammaN_Prespecified<-IPDNMRJAGSresultsPreSpecified$BUGSoutput$summary[12,]
 
 
 PrespecifiedIPDNMR_Table<-rbind(gamma_Prespecified,deltaDF_Prespecified,deltaGA_Prespecified,deltaN_Prespecified,gammaDF_Prespecified,gammaGA_Prespecified,gammaN_Prespecified)
@@ -203,7 +203,7 @@ PrespecifiedIPDNMR_Table<-PrespecifiedIPDNMR_Table[,-todrop]
 PrespecifiedIPDNMR_Table<-round(PrespecifiedIPDNMR_Table,2)
 PrespecifiedIPDNMR_Table$CredibleIntervals<-NA
 for(i in 1:7){
-PrespecifiedIPDNMR_Table[i,4]<-paste(PrespecifiedIPDNMR_Table[i,1],"(",PrespecifiedIPDNMR_Table[i,2],",", PrespecifiedIPDNMR_Table[i,3], ")")
+  PrespecifiedIPDNMR_Table[i,4]<-paste(PrespecifiedIPDNMR_Table[i,1],"(",PrespecifiedIPDNMR_Table[i,2],",", PrespecifiedIPDNMR_Table[i,3], ")")
 }
 
 todrop<-c(1,2,3)
@@ -252,26 +252,26 @@ library(DiagrammeR)
 
 
 Flowchart<-grViz("digraph flowchart {
-      # node definitions with substituted label text
-      node [fontname = Helvetica, shape = rectangle]
-      tab1 [label = '@@1']
-      tab2 [label = '@@2']
-      tab3 [label = '@@3']
-      tab4 [label = '@@4']
-      tab5 [label = '@@5']
-      # edge definitions with the node IDs
-      tab1 -> tab2 -> tab3 ;
-      tab3->tab4;
-      tab3->tab5;
+                 # node definitions with substituted label text
+                 node [fontname = Helvetica, shape = rectangle]
+                 tab1 [label = '@@1']
+                 tab2 [label = '@@2']
+                 tab3 [label = '@@3']
+                 tab4 [label = '@@4']
+                 tab5 [label = '@@5']
+                 # edge definitions with the node IDs
+                 tab1 -> tab2 -> tab3 ;
+                 tab3->tab4;
+                 tab3->tab5;
 
-      }
+                 }
 
-      [1]: 'Number of prognostic factors, np=57'
-      [2]: 'Number of prognostic factors with missing data less than 50%, np=53'
-      [3]: 'Number of prognostic factors correlated less than 70%, np=31 '
-      [4]: 'Number of prognostic factors in LASSO model, np=9 '
-      [5]: 'Number of prognostic factors in pre-specified model, np=14 '
+                 [1]: 'Number of prognostic factors, np=57'
+                 [2]: 'Number of prognostic factors with missing data less than 50%, np=53'
+                 [3]: 'Number of prognostic factors correlated less than 70%, np=31 '
+                 [4]: 'Number of prognostic factors in LASSO model, np=9 '
+                 [5]: 'Number of prognostic factors in pre-specified model, np=14 '
 
-      ")
+                 ")
 
 

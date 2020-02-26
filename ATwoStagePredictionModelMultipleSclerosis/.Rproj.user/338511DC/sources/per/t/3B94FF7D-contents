@@ -10,8 +10,6 @@
 ###load the needed libraries
 library(devtools)
 install_github("htx-r/CleaningData",force=TRUE)
-install_github("htx-r/NMAPredictionsRiskModel", force = TRUE)
-library(NMAPredictionsRiskModel)
 library(CleaningData)
 library(R2jags)
 library(dplyr)
@@ -51,6 +49,7 @@ RCTs<-RCTs0[RCTs0$STUDYID!="SENTINEL" & RCTs0$STUDYID!="ADVANCE" ,]
 #exclude highly correlated variables
 ###and recode them in numerical values (e.g. Male=1, Female=0)
 ## transformations of continuous variables to approximate normal distribution
+source("R/numericalDataRisk.fun.R")
 MSrelapse<-numericalDataRisk.fun(RCTs)  ##final full dataset
 
 
@@ -66,6 +65,7 @@ source('EPVandSampleSize.R')
 #Step 2. Build two different risk models with shrinkage
 
 ######## Model 1 - results of LASSO model with LASSO shrinkage
+source("R/RiskModels.fun.R")
 LASSOModel<-RiskModels.fun(MSrelapse,"LASSOModel")
 #########  Model 2 - Results of Pre-specified model using Penalized Maximum Likelihood Estimation for shrinkage
 PreSpecifiedModel<-RiskModels.fun(MSrelapse,"PreSpecifiedModel")
@@ -73,6 +73,7 @@ PreSpecifiedModel<-RiskModels.fun(MSrelapse,"PreSpecifiedModel")
 #Step 3. Bootstrap calibration and discrimination by using the same bootstrap sample for two models each time
 ###needs more than 3 hours to run! You can skip it without any problem further
 ###Performance table of models : discrimination and calibration
+source("R/BootstrapValidation.fun.R")
 data1<-na.omit(MSrelapse)
 todrop<-c("STUDYID","USUBJID","TRT01A")
 data1<-data1[ , !(names(data1) %in% todrop)]
@@ -95,22 +96,23 @@ source('Plots.R')
 source('DataForIPDNMR.R')
 
 #Step 2. Run the model & results & check of traceplots
-IPDNMRJAGSmodelLASSO <- jags.parallel(data = jagsdataIPDNMRLASSO,inits=NULL,parameters.to.save = c('gamma.w', 'logitpplacebo','gamma', 'ORref','delta','u','logitp'),model.file = modelIPDNMR,
+source("R/modelIPDNMR.R")
+IPDNMRJAGSresultsLASSO <- jags.parallel(data = jagsdataIPDNMRLASSO,inits=NULL,parameters.to.save = c('gamma.w', 'logitpplacebo','gamma', 'ORref','delta','u','logitp'),model.file = modelIPDNMR,
                                         n.chains=2,n.iter = 10000,n.burnin = 1000,DIC=F,n.thin = 10)
 
-IPDNMRJAGSmodelPreSpecified <- jags.parallel(data = jagsdataIPDNMRPreSpecified,inits=NULL,parameters.to.save = c('gamma.w', 'logitpplacebo','gamma', 'ORref','delta','u','logitp'),model.file = modelIPDNMR,
+IPDNMRJAGSresultsPreSpecified <- jags.parallel(data = jagsdataIPDNMRPreSpecified,inits=NULL,parameters.to.save = c('gamma.w', 'logitpplacebo','gamma', 'ORref','delta','u','logitp'),model.file = modelIPDNMR,
                                       n.chains=2,n.iter = 10000,n.burnin = 1000,DIC=F,n.thin = 10)
 
 # Results using LASSO model
-print(IPDNMRJAGSmodelLASSO,varname=c("gamma.w","ORref","u","delta"))
+print(IPDNMRJAGSresultsLASSO,varname=c("gamma.w","ORref","u","delta"))
 # Results using Pellegrini's model
-print(IPDNMRJAGSmodelPreSpecified,varname=c("gamma.w","ORref","u","delta"))
+print(IPDNMRJAGSresultsPreSpecified,varname=c("gamma.w","ORref","u","delta"))
 
 # traceplots
 
-traceplot(IPDNMRJAGSmodelLASSO$BUGSoutput,varname=c("ORref","u", "gamma.w", "gamma"))
+traceplot(IPDNMRJAGSresultsLASSO$BUGSoutput,varname=c("ORref","u", "gamma.w", "gamma"))
 
-traceplot(IPDNMRJAGSmodelPreSpecified$BUGSoutput,varname=c("ORref","u", "gamma.w", "gamma"))
+traceplot(IPDNMRJAGSresultsPreSpecified$BUGSoutput,varname=c("ORref","u", "gamma.w", "gamma"))
 
 #Step 3. Plot of IPD NMR with both models
 source('GraphForPredictedRisk.R')
