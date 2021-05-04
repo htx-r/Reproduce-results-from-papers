@@ -1,0 +1,19 @@
+DATA1=read_excel("C:/Users/kc19o338/Desktop/Schizophrenia project/dataset_relapse.last.xlsx", na="99999")
+DATA<-DATA1[!is.na(DATA1$N_rehospitalized),]
+excludeID <-c(3189,4440)
+DATA=DATA[!DATA$Final_ID_all%in%excludeID,]
+unique(DATA1[is.na(DATA1$N_rehospitalized),]$Final_ID_all)
+
+tokeep<-c("Final_ID_all","Study_name","Drug_name", "N_randomized","N_rehospitalized")
+DATA_final<-DATA[,tokeep]
+
+length(unique(DATA$Drug_name))
+unique(DATA$Drug_name)
+
+#prepare the data
+DATApairs=pairwise(treat=Drug_name, event=N_rehospitalized, n=N_randomized, data=DATA, sm="OR", studlab=Final_ID_all, allstudies = TRUE)
+
+#run NMA and create an object called EFF for efficacy
+net1<-netmetabin(event1, n1, event2, n2, treat1, treat2, studlab, data = DATApairs, sm = "OR",  prediction=TRUE, ref="Placebo")
+#network plot
+netgraph(net1, plastic=F, thickness="number.of.studies", multiarm = F, points=T, col=1)

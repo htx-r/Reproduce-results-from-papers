@@ -1,0 +1,150 @@
+---
+title: "Network Meta-analysis and meta-regression for the secondary outcome of efficacy: Rehospitalization"
+subtitle: Prepared by Konstantina on 11 October, refers to the analysis in frequentist setting
+output:
+  word_document:
+    fig_height: 7
+    fig_width: 10
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(devtools)
+install_github("esm-ispm-unibe-ch/NMAJags")
+library(NMAJags)
+library(R2jags)
+library(netmeta)
+library(meta)
+library(metafor)
+library(readxl)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+DATA1=read_excel("C:/Users/kc19o338/Desktop/Schizophrenia project/dataset_relapse.last.xlsx", na="99999")
+```
+#Delete studies
+
+I excluded all the studies that did not have the N_rehospitalized
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+DATA<-DATA1[!is.na(DATA1$N_rehospitalized),]
+excludeID <-c(3189,4440)
+DATA=DATA[!DATA$Final_ID_all%in%excludeID,]
+unique(DATA1[is.na(DATA1$N_rehospitalized),]$Final_ID_all)
+```
+
+#Description of the network
+
+Below is a description for the network formed by studies examining the secondary outcome of efficacy Rehospitalization.
+
+Below are the total number of participants in each of the included drug
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#describe the data
+tapply(DATA$N_randomized,DATA$Drug_name,sum,na.rm=T)
+
+```
+
+
+Number of drugs
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+length(unique(DATA$Drug_name))
+```
+Number of studies:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(length(table(DATA$Study_name)))
+```
+
+Number of arms in our tudies
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+table(table(DATA$Final_ID_all))
+```
+The network consists of 31 two-arm studies.
+
+The plot below shows the available data
+
+```{r, include=FALSE}
+#prepare the data
+DATApairs=pairwise(treat=Drug_name, event=N_rehospitalized, n=N_randomized, data=DATA, sm="OR", studlab=Final_ID_all, allstudies = TRUE)
+
+#run NMA and create an object called EFF for efficacy
+net1<-netmetabin(event1, n1, event2, n2, treat1, treat2, studlab, data = DATApairs, sm = "OR",  prediction=TRUE, ref="Placebo")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#leaguetable<-netleague(net1)
+#library(WriteXLS)
+#
+# League table from random effects model
+#
+#library("xlsx")
+#write.xlsx(leaguetable$fixed, "C:/Users/kc19o338/Desktop/Schizophrenia project/leaguetable_Rehospitalization.xlsx", sheetName = "leaguetable_Rehospitalization")
+
+#drug_names<-as.data.frame(sort(unique(DATA$Drug_name)))
+#write.xlsx(drug_names, "C:/Users/kc19o338/Desktop/Schizophrenia project/DrugNames_Rehospitalization.xlsx", sheetName = "DrugNamesRehospitalization")
+
+```
+
+```{r, echo=FALSE}
+
+#network plot
+netgraph(net1, plastic=F, thickness="number.of.studies", multiarm = F, points=T, col=1)
+```
+
+#FREQUENTIST SETTING
+
+#Network meta-analysis 
+
+For this outcome as it is a rare event, we used netmetabin command that performs NMA with Mantel-Haenszel method (in a frequentist setting only)
+
+Below are the relative treatment effects from the NMA model. 
+The first graph presents the sorted ORs, whereas the second graph presents the ORs in the same order as in the Bayesian setting later 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#forest plots
+forest(net1, ref="Placebo", sortvar = -Pscore,xlab="OR")
+
+forest(net1, ref="Placebo", xlab="OR")
+```
+
+
+The P-scores (equivalent to the SUCRAs) are shown below
+```{r, echo=FALSE}
+netrank(net1)
+```
+
+This is a fixed effect model using Mantel-Haenzel method (netmetabin command), because of rare events for this outcome.
+
+There is important evidence of inconsistency in the data. There are in total
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+split=netsplit(net1) 
+SIDEp=split$compare.fixed$p
+SIDEp=SIDEp[!is.na(SIDEp)]
+#proportion of inconsistent loops
+cat(length(SIDEp))
+```
+
+comparisons in the network that can be detached, and there is inconsistency (according to SIDE p-value<0.10) in
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+cat(length(SIDEp[SIDEp<=0.1]))
+```
+loops which gives a % of inconsistent loops equal to
+```{r, echo=F, message=FALSE, warning=FALSE}
+cat(paste(round((length(SIDEp[SIDEp<=0.1])/length(SIDEp))*100,1),"%"))
+```
+
+The p-value from the design-by-treatment test is
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+a=decomp.design(net1)
+print(round(a$Q.inc.random$pval,3))
+```
+

@@ -1,0 +1,152 @@
+---
+title: "Network Meta-analysis for the secondary outcome: Sedation"
+subtitle: Prepared by Konstantina on 27 August 2020, refers to the analysis in both frequentist and Bayesian setting
+output:
+  word_document:
+    fig_height: 7
+    fig_width: 10
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(devtools)
+install_github("esm-ispm-unibe-ch/NMAJags")
+library(NMAJags)
+library(R2jags)
+library(netmeta)
+library(meta)
+library(metafor)
+library(readxl)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+DATA1=read_excel("C:/Users/kc19o338/Desktop/Schizophrenia project/dataset_relapse_last2020.xlsx", na="99999")
+#DATA1<-DATA1[,-1]
+```
+#Delete studies
+
+Studies excluded because of missing values in variable N_Sedation
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+out=unique(DATA1$Final_ID_all[is.na(DATA1$N_Sedation)])
+out
+```
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+out=unique(DATA1$Final_ID_all[is.na(DATA1$N_Sedation)])
+keep=is.na(match(DATA1$Final_ID_all,out))
+DATA=DATA1[keep,] 
+
+```
+
+#Description of the network
+
+Below is a description for the network formed by studies examining the secondary outcome of side effects: Antiparkinson Drugs
+
+Below are the total number of participants in each of the included drug
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#describe the data
+tapply(DATA$N_randomized,DATA$Drug_name,sum,na.rm=T)
+summary(DATA$N_Sedation/DATA$N_randomized)
+
+
+```
+
+Number of studies:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+print(length(table(DATA$Study_name)))
+```
+Number of drugs:
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+length(unique(DATA$Drug_name))
+```
+Number of arms in our studies
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+table(table(DATA$Final_ID_all))
+
+```
+The network consists of 46 two-arm studies and 3 three-arm study.
+
+The plot below shows the available data
+
+```{r, include=FALSE}
+#prepare the data
+DATApairs=pairwise(treat=Drug_name, event=N_Sedation, n=N_randomized, data=DATA, sm="OR", studlab=Final_ID_all, allstudies = TRUE)
+
+#run NMA and create an object called EFF for efficacy
+net1<-netmetabin(event1, n1, event2, n2, treat1, treat2, studlab, data = DATApairs, sm = "OR",  prediction=TRUE, ref="Placebo")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#leaguetable<-netleague(net1)
+#library(WriteXLS)
+#
+# League table from random effects model
+#
+#library("xlsx")
+#write.xlsx(leaguetable$fixed, "C:/Users/kc19o338/Desktop/Schizophrenia project/leaguetable_Sedation.xlsx", sheetName = "leaguetable_Sedation")
+
+#drug_names<-as.data.frame(sort(unique(DATA$Drug_name)))
+#write.xlsx(net1$trts, "C:/Users/kc19o338/Desktop/Schizophrenia project/DrugNames_Sedation.xlsx", sheetName = "DrugNamesSedation")
+x<-data.frame(exp(net1$TE.fixed[,15]))
+y<-data.frame(exp(net1$lower.fixed[,15]))
+z<-data.frame(exp(net1$upper.fixed[,15]))
+w<-cbind(x,y,z)
+names(w)<-c("mean", "2.5%", "97.5%")
+write.xlsx(w, "C:/Users/kc19o338/Desktop/Schizophrenia project/ORvsPlacebo_Sedation.xlsx", sheetName = "DrugNamesSedation")
+
+```
+
+```{r, echo=FALSE}
+
+#network plot
+netgraph(net1, plastic=F, thickness="number.of.studies", multiarm = F, points=T, col=1)
+```
+#FREQUENTIST SETTING
+
+#Network meta-analysis 
+
+For this outcome as it is a rare event, we used netmetabin command that performs NMA with Mantel-Haenszel method (in a frequentist setting only)
+
+Below are the relative treatment effects from the NMA model. 
+The first graph presents the sorted ORs, whereas the second graph presents the ORs in the same order as in the Bayesian setting later 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#forest plots
+forest(net1, ref="Placebo", sortvar = -Pscore,xlab="OR")
+
+forest(net1, ref="Placebo", xlab="OR")
+```
+
+The P-scores (equivalent to the SUCRAs) are shown below
+```{r, echo=FALSE}
+netrank(net1)
+```
+
+This is a fixed effect model using Mantel-Haenzel method (netmetabin command), because of rare events for this outcome.
+
+There is no evidence of inconsistency in the data. There are in total
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+split=netsplit(net1) 
+SIDEp=split$compare.fixed$p
+SIDEp=SIDEp[!is.na(SIDEp)]
+#proportion of inconsistent loops
+cat(length(SIDEp))
+```
+
+comparisons in the network that can be detached and there is inconsistency in 
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+cat(length(SIDEp[SIDEp<=0.1]))
+```
+loops which gives a % of inconsistent loops equal to
+```{r, echo=F, message=FALSE, warning=FALSE}
+cat(paste(round((length(SIDEp[SIDEp<=0.1])/length(SIDEp))*100,1),"%"))
+```

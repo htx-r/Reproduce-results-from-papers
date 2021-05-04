@@ -1,3 +1,9 @@
+##############################################################################
+############## Function needed for the Decision Curve Analysis plot ###############
+###############################################################################
+
+
+
 dca.fun <- function(data, outcome, predictors, xstart=0.01, xstop=0.99, xby=0.01,
                 ymin=-0.05, probability=NULL, harm=NULL,graph=TRUE, intervention=FALSE,
                 interventionper=100, smooth=FALSE,loess.span=0.10) {

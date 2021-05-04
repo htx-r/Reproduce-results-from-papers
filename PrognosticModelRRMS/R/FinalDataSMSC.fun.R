@@ -9,7 +9,7 @@ FinalDataSMSC.fun=function(datapath){
     ## Read the IPD SMSC data
 
     # path and loading the data
-    SMSCpath=paste(datapath,"/SMSC_phase1_cycles.xlsx",sep="")
+    SMSCpath=paste(datapath,"/SMSC_corrected.xlsx",sep="")
     SMSCdata <- read_excel(SMSCpath)
     #keep only needed variables, based on the literature and pre-existing prognostic models on relapses for RRMS patients
     tokeep<-c("unique.visit.id" , "patient.id", "age", "gender","edss", "disease.duration","treatment.naive.prior.visit", "months.since.last.relapse", "nr.relapses.2y.prior.study",
@@ -44,8 +44,8 @@ FinalDataSMSC.fun=function(datapath){
     SMSCdata$gender<-as.factor(SMSCdata$gender)
 
     ### treatment during cycle 0 for no and 1 for yes
-    SMSCdata$treatment.during.cycle[which(SMSCdata$treatment.during.cycle=="No")]<-0
-    SMSCdata$treatment.during.cycle[which(SMSCdata$treatment.during.cycle=="Yes")]<-1
+    SMSCdata$treatment.during.cycle[which(SMSCdata$treatment.during.cycle=="FALSE")]<-0
+    SMSCdata$treatment.during.cycle[which(SMSCdata$treatment.during.cycle=="TRUE")]<-1
     SMSCdata$treatment.during.cycle<-as.factor(SMSCdata$treatment.during.cycle)
 
     ##make a numeric outcome
@@ -60,12 +60,12 @@ FinalDataSMSC.fun=function(datapath){
 
     # treatment time during cycle should be zero when treatment during cycle is 0
 
-    SMSCdata$treatment.time.during.cycle.months[which(SMSCdata$treatment.during.cycle==0)]<-0
-    SMSCdata$treatment.time.during.cycle.monthsFactor<-NA
-    SMSCdata$treatment.time.during.cycle.monthsFactor<-SMSCdata$treatment.time.during.cycle.months
-    SMSCdata$treatment.time.during.cycle.monthsFactor[which(SMSCdata$treatment.time.during.cycle.monthsFactor<9)]<-0
-    SMSCdata$treatment.time.during.cycle.monthsFactor[which(SMSCdata$treatment.time.during.cycle.monthsFactor>=9)]<-1
-    SMSCdata$treatment.time.during.cycle.monthsFactor<-as.factor(SMSCdata$treatment.time.during.cycle.monthsFactor)
+   # SMSCdata$treatment.time.during.cycle.months[which(SMSCdata$treatment.during.cycle==0)]<-0
+    #SMSCdata$treatment.time.during.cycle.monthsFactor<-NA
+    #SMSCdata$treatment.time.during.cycle.monthsFactor<-SMSCdata$treatment.time.during.cycle.months
+    #SMSCdata$treatment.time.during.cycle.monthsFactor[which(SMSCdata$treatment.time.during.cycle.monthsFactor<9)]<-0
+    #SMSCdata$treatment.time.during.cycle.monthsFactor[which(SMSCdata$treatment.time.during.cycle.monthsFactor>=9)]<-1
+    #SMSCdata$treatment.time.during.cycle.monthsFactor<-as.factor(SMSCdata$treatment.time.during.cycle.monthsFactor)
 
 
 

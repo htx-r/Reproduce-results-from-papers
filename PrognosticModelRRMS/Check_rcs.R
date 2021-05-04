@@ -9,7 +9,6 @@ SMSCdata_glmer$nr.relapses.2y.prior.study<-as.factor(SMSCdata_glmer$nr.relapses.
 SMSCdata_glmer$treatment.naive.prior.visit<-as.factor(SMSCdata_glmer$treatment.naive.prior.visit)
 SMSCdata_glmer$gender<-as.factor(SMSCdata_glmer$gender)
 SMSCdata_glmer$treatment.during.cycle<-as.factor(SMSCdata_glmer$treatment.during.cycle)
-SMSCdata_glmer$treatment.time.during.cycle.monthsFactor<-as.factor(SMSCdata_glmer$treatment.time.during.cycle.monthsFactor)
 SMSCdata_glmer$outcome<-as.factor(SMSCdata_glmer$outcome)
 
 glm_rcs<-lrm((outcome)~ rcs(age,4) + rcs(disease.duration,4) + rcs(edss,4) + nr.Gd.enhanced.lesions + nr.relapses.2y.prior.study +

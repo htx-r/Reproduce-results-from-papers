@@ -26,12 +26,9 @@ library(plyr)
 library(pmsampsize)
 library(shiny)
 library(shinythemes)
-library(devtools)
-install_git("https://github.com/BavoDC/CalibrationCurves")
-library(CalibrationCurves)
 
 # give/change your datapath (the datapath that includes the data)
-mydatapath="C:/Users/kc19o338/Desktop/SMSC"
+mydatapath="C:/Users/kc19o338/Desktop/SMSC Basel"
 
 ########################## DATASET NEEDED FOR THE PRE-SPECIFIED PROGNOSTIC MODEL ##############################
 # function that keeps only the needed variables (selected via pre-existing prognostic models on the literature, for RRMS patients)
@@ -126,9 +123,6 @@ app_cstat_model
 mod_log_2
 confint(mod_log_2)
 
-####################################  Calibration Plot  #################################################################
-val.prob.ci.2(SMSCdataC$Risk, as.numeric(SMSCdataC$outcome)-1, xlim=c(0,0.8))
-
 ########################  Calculation of the EPV and the required sample size based on Riley et al   ############
 source("EPVandSampleSizePrModel.R")
 EPV
@@ -137,36 +131,39 @@ EPV
 source("R/dca.fun.R")
 SMSCdataC$outcome2<-as.numeric(SMSCdataC$outcome)-1
 SMSCdataC$PrognosticModel<-SMSCdataC$Risk
-SMSCdataC<-as.data.frame(SMSCdataC)
-dca.fun(data=SMSCdataC, outcome="outcome2", predictors="PrognosticModel", xstop = 0.5)
+dca.fun(data=SMSCdataC, outcome="outcome2", predictors="PrognosticModel", xstop = 0.4)
 
 ############################# R-shiny app ##################################################################
 source('R-shinyPr.R')
-shinyApp(ui = ui, server = server) #also available in https://cinema.ispm.unibe.ch/shinies/rrms/
+shinyApp(ui = ui, server = server) #also available in
 
 ######################  INTERNAL VALIDATION  ##################
 
-##centralize the variables
-source("imp_centralize.R")
-#source the function for bootstrap validation
-source("R/BootstrapValidation_PrModel.fun.R")
-optimism_AUC<-NA
-for (i in (1:10)){
-  optimism_AUC[i]<-BootstrapValidation_PrModel.fun(imp.list1[[i]], samples=500)
-  }
-source("R/BootstrapValidation_PrModel2.fun.R")
-optimism_c_slope<-NA
-for (i in (1:10)){
-  optimism_c_slope[i]<-BootstrapValidation_PrModel2.fun(imp.list1[[i]], samples=500)
-}
-m_optimism_AUC<-mean(optimism_AUC)
-m_optimism_c_slope<-mean(optimism_c_slope)
+source("R/BootstrapValidationPrModel.fun.R")
+Validation21<-BootstrapValidationPrModel.fun(imp.list[[1]],10,jagsoutput=SMSCjagsResults1)
+val21<-cbind(Validation21[[4]], Validation21[[5]])
+Validation22<-BootstrapValidationPrModel.fun(imp.list[[2]],10, jagsoutput=SMSCjagsResults2)
+val22<-cbind(Validation22[[4]], Validation22[[5]])
+Validation23<-BootstrapValidationPrModel.fun(imp.list[[3]],10, jagsoutput=SMSCjagsResults3)
+val23<-cbind(Validation23[[4]], Validation23[[5]])
+Validation24<-BootstrapValidationPrModel.fun(imp.list[[4]],10, jagsoutput=SMSCjagsResults4)
+val24<-cbind(Validation24[[4]], Validation24[[5]])
+Validation25<-BootstrapValidationPrModel.fun(imp.list[[5]],10, jagsoutput=SMSCjagsResults5)
+val25<-cbind(Validation25[[4]], Validation25[[5]])
+Validation26<-BootstrapValidationPrModel.fun(imp.list[[6]],10, jagsoutput=SMSCjagsResults6)
+val26<-cbind(Validation26[[4]], Validation26[[5]])
+Validation27<-BootstrapValidationPrModel.fun(imp.list[[7]],10, jagsoutput=SMSCjagsResults7)
+val27<-cbind(Validation27[[4]], Validation27[[5]])
+Validation28<-BootstrapValidationPrModel.fun(imp.list[[8]],10, jagsoutput=SMSCjagsResults8)
+val28<-cbind(Validation28[[4]], Validation28[[5]])
+Validation29<-BootstrapValidationPrModel.fun(imp.list[[9]],10, jagsoutput=SMSCjagsResults9)
+val29<-cbind(Validation29[[4]], Validation29[[5]])
+Validation210<-BootstrapValidationPrModel.fun(imp.list[[10]],10, jagsoutput=SMSCjagsResults10)
+val210<-cbind(Validation210[[4]], Validation210[[5]])
+val2<-rbind(val1,val2,val3,val4,val5,val6,val7,val8,val9,val10)
+colnames(val2)<-c("AUC corrected", "c-slope corrected")
+val2
+AUC_corrected<-mean(val2[,1])
+cslope_corrected<-mean(val2[,2])
+cslope_corrected<-mean(val2[,2])
 
-AUC_corrected<-app_cstat_model$auc[1]-m_optimism_AUC
-cslope_corrected<-mod_log_2$coefficients[2]-m_optimism_c_slope
-
-##################################### DECISION CURVE ANALYSIS ##################################################
-source("R/dca.fun.R")
-SMSCdataC$outcome2<-as.numeric(SMSCdataC$outcome)-1
-SMSCdataC$PrognosticModel<-SMSCdataC$Risk
-dca.fun(data=SMSCdataC, outcome="outcome2", predictors="PrognosticModel", xstop = 0.4)

@@ -72,17 +72,6 @@ MIDataSMSC.fun=function(datapath){
   dataset$treatment.naive.prior.visit[which(dataset$treatment.naive.prior.visit==TRUE)]<-1
   dataset$treatment.naive.prior.visit<-as.factor(dataset$treatment.naive.prior.visit)
 
-  ### treatmentt time during cycle 0 months if no treatment was given
-  dataset$treatment.time.during.cycle.months[which(dataset$treatment.during.cycle==0)]<-0
-  dataset$treatment.time.during.cycle.months<-exp(dataset$treatment.time.during.cycle.months)*(10^(-9))
-
-  dataset$treatment.time.during.cycle.monthsFactor<-NA
-  dataset$treatment.time.during.cycle.monthsFactor<- dataset$treatment.time.during.cycle.months
-  dataset$treatment.time.during.cycle.monthsFactor[which( dataset$treatment.time.during.cycle.monthsFactor<9)]<-0
-  dataset$treatment.time.during.cycle.monthsFactor[which( dataset$treatment.time.during.cycle.monthsFactor>=9)]<-1
-  dataset$treatment.time.during.cycle.monthsFactor<-as.factor( dataset$treatment.time.during.cycle.monthsFactor)
-
-
   # GD enhanced lessions, instead of 0, 1, ..., 18 now we will have 0 and >0
   dataset$nr.Gd.enhanced.lesions[which(dataset$nr.Gd.enhanced.lesions>0)]<-1
   dataset$nr.Gd.enhanced.lesions<-as.factor(dataset$nr.Gd.enhanced.lesions)
