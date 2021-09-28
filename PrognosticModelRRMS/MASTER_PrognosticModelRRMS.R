@@ -141,7 +141,7 @@ SMSCdataC<-as.data.frame(SMSCdataC)
 dca.fun(data=SMSCdataC, outcome="outcome2", predictors="PrognosticModel", xstop = 0.5)
 
 ############################# R-shiny app ##################################################################
-source('R-shinyPr.R')
+source('R-shiny.R')
 shinyApp(ui = ui, server = server) #also available in https://cinema.ispm.unibe.ch/shinies/rrms/
 
 ######################  INTERNAL VALIDATION  ##################
