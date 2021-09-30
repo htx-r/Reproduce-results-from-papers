@@ -1,0 +1,10 @@
+Package: DCA_NMA
+Type: Package
+Title: Decision curve analysis for personalized treatment choice between multiple options
+Version: 0.1.0
+Author: Konstantina Chalkou, Andrew Vickers, Fabio Pellegrini, Andrea Manca, Georgia Salanti
+Maintainer: The package maintainer <konstantina.chalkou@ispm.unibe.ch>
+Description: Evaluation of an individualized prediction model in a network meta-analysis framework,
+using an extended Decision Curve Analysis methodology.Decision curve analysis can be applied to 
+network meta-analyses of randomized trials to evaluate whether the use of prediction models to aid 
+treatment decision-making would do more good than harm.

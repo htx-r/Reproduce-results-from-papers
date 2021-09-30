@@ -1,0 +1,24 @@
+{
+    "id": "EAC5290E",
+    "path": "~/GitHub/Reproduce-results-from-papers/DCA_NMA/DCA_ThersholdAllRanges.R",
+    "project_path": "DCA_ThersholdAllRanges.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1632993466750.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "58,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1632993530,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1632993530898,
+    "read_only": false,
+    "read_only_alternatives": []
+}
