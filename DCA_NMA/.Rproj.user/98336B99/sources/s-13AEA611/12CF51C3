@@ -1,0 +1,32 @@
+{
+    "id": "12CF51C3",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643276408533.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "expression": "ades",
+        "caption": "ades",
+        "totalObservations": "67381",
+        "displayedObservations": "67381",
+        "variables": "35",
+        "cacheKey": "2B17AABB",
+        "object": "ades",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=ades&cache_key=2B17AABB&max_cols=50",
+        "preview": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 4211540126433637486,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643276408533,
+    "read_only": false,
+    "read_only_alternatives": []
+}

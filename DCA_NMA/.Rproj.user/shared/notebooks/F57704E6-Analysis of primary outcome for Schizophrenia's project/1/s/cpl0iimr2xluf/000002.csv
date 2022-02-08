@@ -1,0 +1,3 @@
+"0",""
+"0","#forest plots"
+"0","forest(net1, ref=""Placebo"", sortvar = -Pscore,xlab=""OR"")"

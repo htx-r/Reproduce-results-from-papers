@@ -1,0 +1,14 @@
+"0","library(devtools)"
+"0","install_github(""esm-ispm-unibe-ch/NMAJags"")"
+"2","Skipping install of 'NMAJags' from a github remote, the SHA1 (72e59a1a) has not changed since last install.
+  Use `force = TRUE` to force installation
+"
+"0","library(NMAJags)"
+"0","library(R2jags)"
+"0","library(netmeta)"
+"0","library(meta)"
+"0","library(metafor)"
+"0","library(readxl)"
+"0","library(xlsx)"
+"0","library(tidyverse)"
+"0","library(WriteXLS)"

@@ -1,0 +1,3 @@
+"0","DATA=read_csv(""CC:/Users/kc19o338/Desktop/Kosti/medical_noshows.csv"")"
+"2","Error: 'CC:/Users/kc19o338/Desktop/Kosti/medical_noshows.csv' does not exist in current working directory ('C:/Users/kc19o338/Documents/GitHub/Reproduce-results-from-papers/DCA_NMA').
+"

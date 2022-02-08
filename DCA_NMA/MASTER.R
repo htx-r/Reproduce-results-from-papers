@@ -22,21 +22,21 @@ library(hrbrthemes)
 #################            is needed    #####################################
 ########################################################################
 
-#RiskData$RiskpredictedPl<-NA
-##RiskData$RiskpredictedDF<-NA
-##RiskData$RiskpredictedGA<-NA
-#RiskData$RiskpredictedN<-NA
+RiskData$RiskpredictedPl<-NA
+RiskData$RiskpredictedDF<-NA
+RiskData$RiskpredictedGA<-NA
+RiskData$RiskpredictedN<-NA
 ##
-#for (i in 1:nrow(RiskData)){
-#  for(j in 1:99){
-#    if (round(RiskData$RiskPreSpecified[i],2)==round(PlF$Risknew[j],2)) {RiskData$RiskpredictedPl[i]<-PlF$prelapse[j]}
-#    if (round(RiskData$RiskPreSpecified[i],2)==round(DFF$Risknew[j],2)) {RiskData$RiskpredictedDF[i]<-DFF$prelapse[j]}
-#   if (round(RiskData$RiskPreSpecified[i],2)==round(GAF$Risknew[j],2)) {RiskData$RiskpredictedGA[i]<-GAF$prelapse[j]}
-#    if (round(RiskData$RiskPreSpecified[i],2)==round(NF$Risknew[j],2)) {RiskData$RiskpredictedN[i]<-NF$prelapse[j]}
-#
-#
-#     }
-#}
+for (i in 1:nrow(RiskData)){
+  for(j in 1:99){
+    if (round(RiskData$RiskPreSpecified[i],2)==round(PlF$Risknew[j],2)) {RiskData$RiskpredictedPl[i]<-PlF$prelapse[j]}
+    if (round(RiskData$RiskPreSpecified[i],2)==round(DFF$Risknew[j],2)) {RiskData$RiskpredictedDF[i]<-DFF$prelapse[j]}
+   if (round(RiskData$RiskPreSpecified[i],2)==round(GAF$Risknew[j],2)) {RiskData$RiskpredictedGA[i]<-GAF$prelapse[j]}
+    if (round(RiskData$RiskPreSpecified[i],2)==round(NF$Risknew[j],2)) {RiskData$RiskpredictedN[i]<-NF$prelapse[j]}
+
+
+     }
+}
 
 
 

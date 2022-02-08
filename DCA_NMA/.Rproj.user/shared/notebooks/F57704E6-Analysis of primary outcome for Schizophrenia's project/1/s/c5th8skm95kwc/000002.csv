@@ -1,0 +1,6 @@
+"0","#prepare the data"
+"0","DATApairs=pairwise(treat=Drug_name, event=N_relapsed, n=N_randomized, data=DATA, sm=""OR"", studlab=Final_ID_all, allstudies = TRUE)"
+"0",""
+"0","#run NMA and create an object called EFF for efficacy"
+"0","net1<-netmeta(TE, seTE, treat1, treat2, studlab, data = DATApairs, sm = ""OR"", comb.random=TRUE, comb.fixed=FALSE, prediction=TRUE, ref=""Placebo"")"
+"0",""

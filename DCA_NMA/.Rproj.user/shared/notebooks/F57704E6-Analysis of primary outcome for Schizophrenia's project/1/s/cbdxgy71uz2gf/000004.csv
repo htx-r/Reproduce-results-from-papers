@@ -1,0 +1,7 @@
+"0",""
+"0","NMAinJAGSBinP <- jags.parallel(data = NMAdataBinary, inits = NULL, "
+"0","                               parameters.to.save = c(""ORref"",""tau""), n.chains = 2, n.iter = 120000,"
+"0","                               n.burnin = 10000,DIC=F,n.thin=10,"
+"0","                               model.file = modelNMABinary)"
+"2","Error in file(con, ""w"") : cannot open the connection
+"

@@ -1,0 +1,48 @@
+"0","library(devtools)"
+"2","Loading required package: usethis
+"
+"0","install_github(""esm-ispm-unibe-ch/NMAJags"")"
+"2","Skipping install of 'NMAJags' from a github remote, the SHA1 (72e59a1a) has not changed since last install.
+  Use `force = TRUE` to force installation
+"
+"0","library(NMAJags)"
+"0","library(R2jags)"
+"2","Loading required package: rjags
+"
+"2","Loading required package: coda
+"
+"2","Linked to JAGS 4.3.0
+"
+"2","Loaded modules: basemod,bugs
+"
+"2","
+Attaching package: ‘R2jags’
+
+"
+"2","The following object is masked from ‘package:coda’:
+
+    traceplot
+
+"
+"0","library(netmeta)"
+"2","Loading required package: meta
+"
+"2","Loading 'meta' package (version 4.18-1).
+Type 'help(meta)' for a brief overview.
+"
+"2","Loading 'netmeta' package (version 1.4-0).
+Type 'help(""netmeta-package"")' for a brief overview.
+"
+"0","library(meta)"
+"0","library(metafor)"
+"2","Loading required package: Matrix
+"
+"2","
+Loading the 'metafor' package (version 3.0-1). For an
+introduction to the package please type: help(metafor)
+
+An updated version of the package (version 3.0-2) is available!
+To update to this version type: install.packages(""metafor"")
+
+"
+"0","library(readxl)"

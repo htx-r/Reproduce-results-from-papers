@@ -1,0 +1,3 @@
+"0",""
+"0","#network plot"
+"0","netgraph(net1, plastic=F, thickness=""number.of.studies"", multiarm = F, points=T, col=1)"

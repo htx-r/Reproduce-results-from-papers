@@ -1,0 +1,32 @@
+{
+    "id": "64AD287F",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643624093595.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "expression": "adrel",
+        "caption": "adrel",
+        "totalObservations": "11737",
+        "displayedObservations": "11737",
+        "variables": "15",
+        "cacheKey": "3E3C603B",
+        "object": "adrel",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=adrel&cache_key=3E3C603B&max_cols=50",
+        "preview": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 14636977965170754,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643624093595,
+    "read_only": false,
+    "read_only_alternatives": []
+}

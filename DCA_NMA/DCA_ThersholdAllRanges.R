@@ -147,21 +147,49 @@ for (t in 379:840){
   nb[t,7]<-(expit(m1$TE.fixed)-e_total)-((n_N*nb$threshold1[t]+n_DF*nb$threshold2[t]+n_GA*nb$threshold2[t])/n_total)
   nb[t,8]<-max(nb$Placebo[t],nb$Natalizumab[t],nb$`Dimethyl FUmerate`[t],nb$`Glatiramer Acetate`[t],nb$Model[t])
   nb[t,9]<-which.max(c(nb$Placebo[t],nb$Natalizumab[t],nb$`Dimethyl FUmerate`[t],nb$`Glatiramer Acetate`[t],nb$Model[t]))
-
+  
 }
 
-dataNeeded<-nb[379:840,c(1,2,9)]
 
+
+nb$dif<-round(nb[,8]-nb[,7],3)
+#dataNeeded$BestApproach[which(dataNeeded$dif<=0.002)]<-5
+
+nb$second<-NA
+
+for (i in 379:840){
+if (nb$BestApproach[i]==5){
+  nb$second[i]<-max(nb$Placebo[i],nb$Natalizumab[i],nb$`Dimethyl FUmerate`[i],nb$`Glatiramer Acetate`[i])
+  nb$dif[i]<-round(nb$max[i]-nb$second[i],3)}
+  else {nb$dif[i]<-nb$dif[i]}
+}
+
+#nb[450:840,]
+
+dataNeeded<-nb[379:840,c(1,2,9,10)]
+dataNeeded$BestApproach[which(dataNeeded$dif<=0.0005)]<-5
+dataNeeded$dif<-dataNeeded$dif*100
 #for(i in 1:nrow(dataNeeded)){
 #if (dataNeeded$threshold1[i]<dataNeeded$threshold2[i]){
 #  dataNeeded$BestApproach[i]<-6
 #}
 #}
-
-
 Plot_Threshold_Ranges<-ggplot(dataNeeded, aes(x=threshold1, y=threshold2, fill= BestApproach, weight=5)) +
   geom_tile() +
+  geom_text(aes(label = dif))+
   scale_fill_distiller(palette = "Spectral") +
   theme_classic2()
 
 
+
+##dataNeeded$BestApproach[which(dataNeeded$dif<=0.01)]<-5
+##Plot_Threshold_Ranges<-ggplot(dataNeeded, aes(x=threshold1, y=threshold2, fill= BestApproach, weight=5)) +
+ ## geom_tile() +
+  ##scale_fill_distiller(palette = "Spectral") +
+  #theme_classic2()
+
+#dataNeeded$BestApproach[which(dataNeeded$dif<=0.002)]<-5
+#Plot_Threshold_Ranges<-ggplot(dataNeeded, aes(x=threshold1, y=threshold2, fill= BestApproach, weight=5)) +
+ # geom_tile() +
+  #scale_fill_distiller(palette = "Spectral") +
+  #theme_classic2()

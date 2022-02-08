@@ -1,0 +1,15 @@
+Package: ThreeStageModelRRMS
+Type: Package
+Title: Combining data to predict heterogeneous effects with application to drugs for Multiple Sclerosis
+Version: 0.1.0
+Authors: Konstantina Chalkou, Tasnim Hamza, Suvitha Subramanian, Pascal Benkert, Jens Kuhle, Chiara Zecca, Gabrielle Simoneau, Fabio Pellegrini, Matthias Egger, Andrea Manca, Georgia Salanti
+Maintainer: The package maintainer <konstantina.chalkou@ispm.unibe.ch>
+Description: A model to estimate the benefit of alternative treatment options for individual patients, combining several sources of data. 
+In details, it is a three-stage prediction model for heterogeneous treatment effects.
+In a first stage, we develop a prognostic model and we predict the baseline risk of the outcome blinded to treatment, using obrervational data. 
+In the second stage, we recallibrate the prognostic model and we re-estimate the risk score, adjusting for the new setting, this of the randomized clinical trials.
+In the third stage, we use this baseline risk score as a single prognostic factor and effect modifier in a network meta-regression model, combining both aggregated data (AD) and individual patient data (IPD). 
+We apply the approach to a network meta-analysis of three randomized clinical trials with IPD, and two AD randomized trials, comparing the relapse rate in Natalizumab, Glatiramer Acetate and Dimethyl Fumarate.
+We find that the baseline risk score modifies the relative and absolute treatment effects. 
+Several patient characteristics such as age and disability status impact on the baseline risk of relapse, and this in turn moderates the benefit that may be expected for each of the treatments.  
+
