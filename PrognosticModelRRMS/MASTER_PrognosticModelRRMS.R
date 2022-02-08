@@ -110,7 +110,19 @@ source("PooledEstimates.R")
 tablewithresults
   #pooled estimates
 Pooled
+Pooled[2,]
+##Table 2 of paper
+round(Pooled$estimates[2:11,1],3)
+round(exp(Pooled$estimates[2:11,1]),2)
+round(exp(Pooled$estimates[2:11,1]-1.96*Pooled$estimates[2:11,2]),2)
+round(exp(Pooled$estimates[2:11,1]+1.96*Pooled$estimates[2:11,2]),2)
 
+Table2<-cbind(round(Pooled$estimates[2:11,1],3),
+      round(exp(Pooled$estimates[2:11,1]),2),
+      paste("(",round(exp(Pooled$estimates[2:11,1]-1.96*Pooled$estimates[2:11,2]),2),",",round(exp(Pooled$estimates[2:11,1]+1.96*Pooled$estimates[2:11,2]),2),")")
+)
+colnames(Table2)<-c("β(k)", "OR", "95% Cr. I.")
+Table2
 ## creation of two new columns with the predicted risk of SMSC individuals and the predicted logit risk
 source("SMSCRiskDataset.R")
 
