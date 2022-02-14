@@ -1,24 +1,24 @@
 {
-    "id": "F63BED5A",
-    "path": "~/GitHub/Reproduce-results-from-papers/Trial_CE/MASTER.R",
-    "project_path": null,
+    "id": "D17BCA25",
+    "path": "~/GitHub/Reproduce-results-from-papers/Trial_CE/data/RRMS_dataset.R",
+    "project_path": "data/RRMS_dataset.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
-    "dirty": true,
-    "created": 1644577451841.0,
+    "dirty": false,
+    "created": 1644844923120.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
-        "cursorPosition": "8,0",
+        "cursorPosition": "0,0",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1644577495,
+    "lastKnownWriteTime": 1644844875,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1644844621866,
+    "last_content_update": 1644844875,
     "read_only": false,
     "read_only_alternatives": []
 }

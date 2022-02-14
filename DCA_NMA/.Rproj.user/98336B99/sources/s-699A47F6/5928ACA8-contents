@@ -1,7 +1,7 @@
 
 library(sas7bdat)
 library(tidyverse)
-
+library(dplyr)
 ##Load the new variable EDSS dataset
 ades<-read.sas7bdat("C:/Users/kc19o338/Desktop/RealWorldPredictionModel/HTx/data/IPD data from 6 Biogen trials/ades.sas7bdat")
 
@@ -29,9 +29,9 @@ df$PROGRESSION<-NA
 
 df <- mutate(df,
                PROGRESSION = case_when(
-                 (BASE<=5.5 & CHG>=1) | (BASE>=6.0 & CHG>=0.5) ~ 1, 
+                 (BASE<=5.5 & CHG>=1) | (BASE>=6.0 & CHG>=0.5) ~ 1,
                  (BASE<=5.5 & CHG<1) | (BASE>=6.0 & CHG<0.5) ~ 0,
-                    TRUE ~ NA_real_ # This is for all other values 
+                    TRUE ~ NA_real_ # This is for all other values
                   ))      # not covered by the above.
 
 ###keep only the scheduled visits that are week12, week24, etc (every 3 months)
@@ -43,15 +43,15 @@ df<-df[!(df$VISIT %in% drop), ]
 df$CPD<-NA
 
 ##if a patient is progressed in one visit and then in the next scheduled visit (after 3 months) is still progressed then CPD=1
-df<-df %>% 
+df<-df %>%
   group_by(USUBJID) %>%
-  mutate(
+  dplyr::mutate(
     CPD= ifelse(
-      (PROGRESSION[row_number()] == 1 & PROGRESSION[row_number()+1]==1), 1, 0
+      (PROGRESSION[dplyr::row_number()] == 1 & PROGRESSION[dplyr::row_number()+1]==1), 1, 0
     )
   )
 
-#df_test<-df %>% 
+#df_test<-df %>%
 #  group_by(USUBJID) %>%
 #  mutate(
 #    CPD= ifelse(
@@ -60,23 +60,23 @@ df<-df %>%
 #  )
 
 ##time to CPD or censored time
-df<-df %>% 
+df<-df %>%
   group_by(USUBJID) %>%
-  mutate(
-    Time_to_CPD_orCensored= ifelse(CPD == 1, ADY[row_number()], max(ADY))
+  dplyr::mutate(
+    Time_to_CPD_orCensored= ifelse(CPD == 1, ADY[dplyr::row_number()], max(ADY))
   )
 
 ##time to cpd only for those who CPD=1
-df<-df %>% 
+df<-df %>%
   group_by(USUBJID) %>%
-  mutate(
-    Time_to_CPD= ifelse(CPD == 1, ADY[row_number()], NA)
+  dplyr::mutate(
+    Time_to_CPD= ifelse(CPD == 1, ADY[dplyr::row_number()], NA)
   )
 
 ##censored time for thos with CPD=0
-df<-df %>% 
+df<-df %>%
   group_by(USUBJID) %>%
-  mutate(
+  dplyr::mutate(
     Censored_Time= ifelse(CPD == 0, max(ADY), NA)
   )
 
@@ -88,11 +88,12 @@ df<-df %>%
 ##keep only the first row
 df<-df[!duplicated(df$USUBJID),]
 
+df$Censored_Time[is.na(df$Censored_Time)]<-0
 
+df$is.censored<-!df$CPD
 ###check the outcome
 table(df$CPD)
 #625 out of 3493, 17.8% with the event
-
 ##########################DEFINE
 table(df$CPD[which(df$STUDYID=="109MS301")])
 ## 225 out of 1186, 19%
@@ -137,4 +138,4 @@ table(df$CPD[which(df$STUDYID=="C-1801" & df$TRTA=="Placebo")])
 #keep<-c("USUBJID","AVAL","CHG")
 #df<-df[,keep]
 
-merge(MSrelapse, df, by="USUBJID")
+RRMS<-merge(MSrelapse, df, by="USUBJID")

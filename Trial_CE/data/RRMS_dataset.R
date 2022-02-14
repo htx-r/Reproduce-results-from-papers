@@ -1,7 +1,15 @@
+############################################################
+####  Script which creates the needed variables:  ######
+### Progression, time to progression, time of censoring  ####
+### and combines the progression information with the #####
+####   baseline characteristics of the patients  ##########
+#####    into a single dataset ##########################
+############################################################
 
-library(sas7bdat)
-library(tidyverse)
-library(dplyr)
+
+
+
+
 ##Load the new variable EDSS dataset
 ades<-read.sas7bdat("C:/Users/kc19o338/Desktop/RealWorldPredictionModel/HTx/data/IPD data from 6 Biogen trials/ades.sas7bdat")
 
@@ -28,11 +36,11 @@ library(dplyr)
 df$PROGRESSION<-NA
 
 df <- mutate(df,
-               PROGRESSION = case_when(
-                 (BASE<=5.5 & CHG>=1) | (BASE>=6.0 & CHG>=0.5) ~ 1,
-                 (BASE<=5.5 & CHG<1) | (BASE>=6.0 & CHG<0.5) ~ 0,
-                    TRUE ~ NA_real_ # This is for all other values
-                  ))      # not covered by the above.
+             PROGRESSION = case_when(
+               (BASE<=5.5 & CHG>=1) | (BASE>=6.0 & CHG>=0.5) ~ 1,
+               (BASE<=5.5 & CHG<1) | (BASE>=6.0 & CHG<0.5) ~ 0,
+               TRUE ~ NA_real_ # This is for all other values
+             ))      # not covered by the above.
 
 ###keep only the scheduled visits that are week12, week24, etc (every 3 months)
 drop<-c("UNSCHED RELAPSE","UNSCHED RELAPSE2","UNSCHED RELAPSE3","UNSCHED RELAPSE4","UNSCHED RELAPSE5","UNSCHED RELAPSE6","UNSCHED RELAPSE7","UNSCHED RELAPSE8","UNSCHED RELAPSE9","UNSCHED RELAPSE10","UNSCHEDRELAPSE10","UNSCHEDULED")

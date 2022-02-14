@@ -1,24 +1,24 @@
 {
-    "id": "F63BED5A",
+    "id": "50C07BA7",
     "path": "~/GitHub/Reproduce-results-from-papers/Trial_CE/MASTER.R",
-    "project_path": null,
+    "project_path": "MASTER.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "3405252448",
     "contents": "",
-    "dirty": true,
-    "created": 1644577451841.0,
+    "dirty": false,
+    "created": 1644844749158.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
-        "cursorPosition": "8,0",
-        "scrollLine": "0"
+        "cursorPosition": "16,91",
+        "scrollLine": "11"
     },
     "folds": "",
-    "lastKnownWriteTime": 1644577495,
+    "lastKnownWriteTime": 1644845549,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1644844621866,
+    "last_content_update": 1644845549503,
     "read_only": false,
     "read_only_alternatives": []
 }
