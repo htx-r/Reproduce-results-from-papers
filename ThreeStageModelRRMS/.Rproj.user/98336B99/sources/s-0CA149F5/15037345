@@ -1,24 +1,24 @@
 {
-    "id": "F63BED5A",
-    "path": "~/GitHub/Reproduce-results-from-papers/Trial_CE/MASTER.R",
-    "project_path": null,
+    "id": "15037345",
+    "path": "~/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/MASTER.R",
+    "project_path": "MASTER.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1644577451841.0,
+    "created": 1645179140569.0,
     "source_on_save": false,
-    "relative_order": 2,
+    "relative_order": 1,
     "properties": {
-        "cursorPosition": "8,0",
+        "cursorPosition": "80,23",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1644845549,
+    "lastKnownWriteTime": 1644309718,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1644845549,
+    "last_content_update": 1644309718,
     "read_only": false,
     "read_only_alternatives": []
 }

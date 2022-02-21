@@ -9,3 +9,24 @@
 library(sas7bdat)
 library(tidyverse)
 library(dplyr)
+library(R2jags)
+
+
+###Create the final dataset
+#Note: I need to make a function so that both of us find the results where we saved them
+#need to send you the proper MS dataset as well as the second one that need to be connected
+source("data/RRMS_dataset.R")
+
+####Treatment effectiveness NMR IPD model for progression
+#load the needed data
+source("data/Data_jagsdataIPDNMR_HR.R")
+#load the model
+source("R/modelIPDNMR_HR_exp.fun.R")
+#run the model
+set.seed(2000)
+IPDNMRJAGSresults_HR<- jags.parallel(data = jagsdataIPDADMA,inits=NULL,parameters.to.save = c('u','delta','gamma0','gamma'),model.file = modelIPDNMR_HR_exp,
+                                         n.chains=2,n.iter = 10000,n.burnin = 1000,DIC=F,n.thin = 10)
+#print the results
+print(IPDNMRJAGSresults_HR)
+#check for convergence via trace-plots
+traceplot(IPDNMRJAGSresults_HR$BUGSoutput)

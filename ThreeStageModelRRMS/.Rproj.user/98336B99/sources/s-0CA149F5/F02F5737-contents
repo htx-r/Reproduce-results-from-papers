@@ -1,0 +1,20 @@
+lp4<-coef(fit4)[1]+coef(fit4)[2]*lp3$linear.predictors+coef(fit4)[3]*RiskData$edss+coef(fit4)[4]*RiskData$nr.Gd.enhanced.lesions+coef(fit4)[5]*RiskData$treatment.naive.prior.visit
+
+lp4<--0.4652818+0.8206208*(0.4971148+0.854295*RiskData$logitp)+0.1795223*RiskData$edss+0.2408484*RiskData$nr.Gd.enhanced.lesions-0.3050687*RiskData$treatment.naive.prior.visit
+
+lp3<-coef(lp3)[1]+coef(lp3)[2]*RiskData$logitp
+lp3<-0.4971148+0.854295*RiskData$logitp
+
+lp4<--0.0573391+0.7010522*(-1.53954-0.0354685*(RCTs$age[i]-mean(RCTs$age))+0.3374181*(RCTs$disease.duration[i]-mean(RCTs$disease.duration))+0.121538*(RCTs$edss[i]-mean(RCTs$edss))-0.03371112*RCTs$nr.Gd.enhanced.lesions[i]-0.06990492*RCTs$nr.relapses.2y.prior.study1[i]+0.1327842*RCTs$nr.relapses.2y.prior.study2[i]-0.4781385*(RCTs$months.since.last.relapse[i]-mean(RCTs$months.since.last.relapse))+0.08644314*RCTs$treatment.naive.prior.visit[i]+0.2541755*RCTs$gender[i]
+)+0.1795223*RiskData$edss+0.2408484*RiskData$nr.Gd.enhanced.lesions-0.3050687*RiskData$treatment.naive.prior.visit
+
+
+logitp<-0.294872 + Pooled[["estimates"]][1,1]+Pooled[["estimates"]][2,1]*(RCTs$age[i]-mean(RCTs$age))+Pooled[["estimates"]][3,1]*(RCTs$disease.duration[i]-mean(RCTs$disease.duration))+Pooled[["estimates"]][4,1]*(RCTs$edss[i]-mean(RCTs$edss))+Pooled[["estimates"]][5,1]*RCTs$nr.Gd.enhanced.lesions[i]+Pooled[["estimates"]][6,1]*RCTs$nr.relapses.2y.prior.study1[i]+Pooled[["estimates"]][7,1]*RCTs$nr.relapses.2y.prior.study2[i]+Pooled[["estimates"]][8,1]*(RCTs$months.since.last.relapse[i]-mean(RCTs$months.since.last.relapse))+Pooled[["estimates"]][9,1]*RCTs$treatment.naive.prior.visit[i]+Pooled[["estimates"]][10,1]*RCTs$gender[i]
+logitp<--1.53954-0.0354685*(RCTs$age[i]-mean(RCTs$age))+0.3374181*(RCTs$disease.duration[i]-mean(RCTs$disease.duration))+0.121538*(RCTs$edss[i]-mean(RCTs$edss))-0.03371112*RCTs$nr.Gd.enhanced.lesions[i]-0.06990492*RCTs$nr.relapses.2y.prior.study1[i]+0.1327842*RCTs$nr.relapses.2y.prior.study2[i]-0.4781385*(RCTs$months.since.last.relapse[i]-mean(RCTs$months.since.last.relapse))+0.08644314*RCTs$treatment.naive.prior.visit[i]+0.2541755*RCTs$gender[i]
+
+lp4<--0.0573391+0.7010522*(-1.53954-0.0354685*(RCTs$age[i]-mean(RCTs$age))+0.3374181*(RCTs$disease.duration[i]-mean(RCTs$disease.duration))+0.121538*(RCTs$edss[i]-mean(RCTs$edss))-0.03371112*RCTs$nr.Gd.enhanced.lesions[i]-0.06990492*RCTs$nr.relapses.2y.prior.study1[i]+0.1327842*RCTs$nr.relapses.2y.prior.study2[i]-0.4781385*(RCTs$months.since.last.relapse[i]-mean(RCTs$months.since.last.relapse))+0.08644314*RCTs$treatment.naive.prior.visit[i]+0.2541755*RCTs$gender[i]
+)+0.1795223*RiskData$edss+0.2408484*RiskData$nr.Gd.enhanced.lesions-0.3050687*RiskData$treatment.naive.prior.visit
+
+lp4<--1.136637-0.02486527*(RCTs$age-mean(RCTs$age))+0.2365477*(RCTs$disease.duration-mean(RCTs$disease.duration))+0.08520448*(RCTs$edss-mean(RCTs$edss))-0.02363325*RCTs$nr.Gd.enhanced.lesions-0.049007*RCTs$nr.relapses.2y.prior.study1+0.09308866*RCTs$nr.relapses.2y.prior.study2-0.3352*(RCTs$months.since.last.relapse-mean(RCTs$months.since.last.relapse))+0.06060115*RCTs$treatment.naive.prior.visit+0.1781903*RCTs$gender)+0.1795223*RiskData$edss+0.2408484*RiskData$nr.Gd.enhanced.lesions-0.3050687*RiskData$treatment.naive.prior.visit
+
+lp4<--1.136637-0.02486527*(RCTs$age-mean(RCTs$age))+0.2365477*(RCTs$disease.duration-mean(RCTs$disease.duration))+0.2647268*(RCTs$edss-mean(RCTs$edss))+0.2172151*RCTs$nr.Gd.enhanced.lesions-0.049007*RCTs$nr.relapses.2y.prior.study1+0.09308866*RCTs$nr.relapses.2y.prior.study2-0.3352*(RCTs$months.since.last.relapse-mean(RCTs$months.since.last.relapse))-0.2444676*RCTs$treatment.naive.prior.visit+0.1781903*RCTs$gender

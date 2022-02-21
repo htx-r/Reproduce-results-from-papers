@@ -1,0 +1,54 @@
+x<-SMSCdata %>%group_by(patient.id) %>%slice(which.max(unique.visit.id))
+
+
+patients1<-SMSCdata[!duplicated(SMSCdata$patient.id), ]
+patients1$cycle<-1
+
+
+
+patients23<- SMSCdata[ !(SMSCdata$unique.visit.id %in% patients1$unique.visit.id), ]
+patients2<-patients23[!duplicated(patients23$patient.id), ]
+patients2$cycle<-2
+
+patients3<-patients23[ !(patients23$unique.visit.id %in% patients2$unique.visit.id), ]
+patients3$cycle<-3
+
+mean(patients1$age)
+sd(patients1$age)
+
+
+y<-SMSCdata[ !(SMSCdata$patient.id %in% patients23$patient.id), ]
+mean(y$age)
+sd(y$age)
+mean(y$edss,na.rm=T)
+sd(y$edss,na.rm=T)
+patientsonly1<-y
+table(patientsonly1$outcome)
+
+p2<-patients23[ !(patients23$patient.id %in% patients3$patient.id), ]
+p2$cycle<-2
+p_2<- patients1[ (patients1$patient.id %in% p2$patient.id), ]
+patientsonly2<-rbind(p2,p_2)
+
+aggregate(patientsonly2$age, list(patientsonly2$cycle), mean)
+aggregate(patientsonly2$age, list(patientsonly2$cycle), sd)
+
+aggregate(patientsonly2$edss, list(patientsonly2$cycle), mean)
+aggregate(patientsonly2$edss, list(patientsonly2$cycle), sd)
+
+table(patientsonly2$outcome, patientsonly2$cycle)
+table(patientsonly2$treatment.during.cycle, patientsonly2$cycle)
+
+p3c1<-patients1[ (patients1$patient.id %in% patients3$patient.id), ]
+p3c2<-patients2[ (patients2$patient.id %in% p3c1$patient.id), ]
+patientsonly3<-rbind(p3c1,p3c2,patients3)
+
+aggregate(patientsonly3$age, list(patientsonly3$cycle), mean)
+aggregate(patientsonly3$age, list(patientsonly3$cycle), sd)
+
+aggregate(patientsonly3$edss, list(patientsonly3$cycle), mean, na.rm=T)
+aggregate(patientsonly3$edss, list(patientsonly3$cycle), sd, na.rm=T)
+
+table(patientsonly3$outcome, patientsonly3$cycle)
+table(patientsonly3$treatment.during.cycle, patientsonly3$cycle)
+
