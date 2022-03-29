@@ -1,0 +1,17 @@
+jagsdataIPDNMR_Relapse <- list(
+  Nstudies=3,
+  Np=nrow(data_CDP_CC),
+  studyid=as.numeric(data_CDP_CC$STUDYID),
+  outcome=as.numeric(data_CDP_CC$RELAPSE2year)-1,
+  outcomeP=data_CDP_CC_placebo$Relapse2year,
+  NpPlacebo=nrow(data_CDP_CC_placebo),
+  treat= rbind(c(1,4,NA),c(1,2,4),c(3,4,NA)),
+  na=c(2,3,2),
+  logitRisknew=logitRisknew,
+  logitmeanRisknew=0,
+  Nnew=99,
+  arm=data_CDP_CC$arm,
+  Risk=data_CDP_CC$logitRisk,
+  nt=4,
+  ref=4
+)
