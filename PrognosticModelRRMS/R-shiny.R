@@ -4,7 +4,7 @@ library(ggplot2)
 server <- function(input, output, session) {
 
 
-  log.risk.score=reactive(-1.942+0.294872-0.034*(input$Age-42.65153)+0.320*(log(input$DiseaseDuration+10)-2.9947)+0.112*(input$EDSS-2.458)+0.004*GdLesions()+NrRelapses()-0.502*(log(input$MonthsSinceLastRelapse+10)-3.80)+0.137*TrNaive()+0.245*Gender()-0.22*TreatNow())
+  log.risk.score=reactive(-1.834 +0.294878-0.035*(input$Age-42.65153)+0.337*(log(input$DiseaseDuration+10)-2.9947)+0.122*(input$EDSS-2.458)-0.034*GdLesions()+NrRelapses()-0.478*(log(input$MonthsSinceLastRelapse+10)-3.80)+0.086*TrNaive()+0.254*Gender()-0.221*TreatNow())
   risk.score1 = reactive(exp(log.risk.score())/(1+exp(log.risk.score())))
   risk.score2=reactive(round(risk.score1(),2))
   risk.score=reactive(risk.score2()*100)
@@ -56,10 +56,10 @@ server <- function(input, output, session) {
 
   NrRelapses <- reactive({
    if(input$NrRelapses=="One") {
-     NrRelapses <- -0.093
+     NrRelapses <- -0.070
        }
     else {
-         NrRelapses <- 0.108
+         NrRelapses <- 0.133
     }
      NrRelapses
   })
