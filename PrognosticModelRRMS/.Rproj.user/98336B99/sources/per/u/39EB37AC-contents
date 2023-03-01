@@ -1,2 +1,0 @@
-x<-read_excel("C:/Users/kc19o338/Desktop/Work of April/SMSC/SMSC Basel/SMSC_corrected.xlsx")
-y<-read_excel("C:/Users/kc19o338/Desktop/Work of April/SMSC/SMSC Basel/SMSC_corrected.xlsx")

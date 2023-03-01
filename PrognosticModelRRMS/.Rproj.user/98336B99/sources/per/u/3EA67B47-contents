@@ -1,6 +1,0 @@
-library(readxl)
-library(xlsx)
-
-adpog1<-read.csv("C:/Users/kc19o338/Desktop/Vivli Data/ar-2020-145_205ms301_2021-04-13/adprog1.csv")
-
-adpog<-read.csv("C:/Users/kc19o338/Desktop/RealWorldPredictionModel/HTx/data/IPD data from 6 Biogen trials/Other outcomes not used yet/adprog.csv")
