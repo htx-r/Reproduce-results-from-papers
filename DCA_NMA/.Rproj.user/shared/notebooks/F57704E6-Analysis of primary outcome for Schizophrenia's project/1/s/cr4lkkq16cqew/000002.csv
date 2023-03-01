@@ -1,5 +1,0 @@
-"0","DATA1<-DATA2[!is.na(DATA2$N_relapsed),]"
-"0","DATA<-DATA1[!is.na(DATA1$N_randomized),]"
-"0","#excludeID <-c(985, 1226, 2997, 3131, 3305, 4114, 4362, 4398, 4410, 4412, 4447, 4519, 4584, 4650)"
-"0","#cat(""The following IDs are excluded because of missing number of relapses:"",paste(""ID="", excludeID))"
-"0","#DATA=DATA[!DATA$Final_ID_all%in%excludeID,]"

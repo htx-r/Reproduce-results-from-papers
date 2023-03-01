@@ -1,4 +1,0 @@
-install.packages("sas7bdat")
-library(sas7bdat)
-
-read.sas7bdat("C:/Users/kc19o338/Desktop/RealWorldPredictionModel/HTx/data/IPD data from 6 Biogen trials/ades.sas7bdat")
