@@ -1,7 +1,0 @@
-x<-read_xlsx("C:/Users/kc19o338/Desktop/Work of April/SMSC/SMSC Basel/SMSC_phase1_cycles.xlsx")
-library(read)
-table(x$ms.specific.treatment)
-summary(x$months.since.last.relapse)
-nrow(x)
-table(x$treatment.during.cycle)
-x$ms.specific.treatment[which(x$treatment.during.cycle=="No")]<-"Placebo"
