@@ -1,0 +1,24 @@
+{
+    "id": "F108A92E",
+    "path": "~/GitHub/Reproduce-results-from-papers/Trial_CE/GraphforPredicted_Risk&Hazards.R",
+    "project_path": "GraphforPredicted_Risk&Hazards.R",
+    "type": "r_source",
+    "hash": "852574907",
+    "contents": "",
+    "dirty": false,
+    "created": 1675081067325.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "74,32",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1675083906,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1675083906943,
+    "read_only": false,
+    "read_only_alternatives": []
+}

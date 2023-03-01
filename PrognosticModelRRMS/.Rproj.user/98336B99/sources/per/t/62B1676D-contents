@@ -1,0 +1,2 @@
+library(readxl)
+MS_validation<-read_excel("C:/Users/kc19o338/Desktop/External Validation/MSproject_patients_HTx_Bulgaria.xlsx")

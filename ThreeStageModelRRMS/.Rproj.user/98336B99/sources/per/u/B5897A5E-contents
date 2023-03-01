@@ -1,0 +1,15 @@
+library(readxl)
+
+SMSC2<-read_excel("C:/Users/kc19o338/Desktop/SMSC/SMSC_corrected.xlsx")
+SMSC3<-read_excel("C:/Users/kc19o338/Desktop/SMSC/SMSC_corrected2.xlsx")
+
+SMSC_placebo<-SMSC2[SMSC2$no.treatments.during.cycle==0,]
+length(unique(SMSC_placebo$patient.id))
+
+
+tokeep<-c("unique.visit.id" , "patient.id", "age", "gender","edss", "disease.duration","treatment.naive.prior.start.cycle", "months.since.last.relapse", "nr.relapses.2y.prior.study",
+          "nr.Gd.enhanced.lesions","treatment.during.cycle","relapse.2y.after.study")
+SMSC_placebo <- SMSC_placebo[,(names(SMSC_placebo) %in% tokeep)]
+SMSC_placebo<-SMSC_placebo[!duplicated(SMSC_placebo$patient.id),]
+
+summary(SMSCdataC$Risk)

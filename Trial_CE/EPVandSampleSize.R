@@ -11,7 +11,7 @@ anova(fullmodel)
 df<-fullmodel[["stats"]][["d.f."]]
 events<- nrow(X[which(dataset$RELAPSE2year==1),])
 EPV<-events/df
-cat("The EPV of the LASSO model is", EPV, fill=TRUE)
+cat("The EPV is", EPV, fill=TRUE)
 
 mod0<-glm(formula = RELAPSE2year~1, family = binomial(link = "logit"),
           data = dataset)

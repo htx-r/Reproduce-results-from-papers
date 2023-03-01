@@ -1,0 +1,24 @@
+{
+    "id": "C61BF7FC",
+    "path": "~/GitHub/Reproduce-results-from-papers/PrognosticModelRRMS/MASTER_PrognosticModelRRMS.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "1294634309",
+    "contents": "",
+    "dirty": false,
+    "created": 1657369710729.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "cursorPosition": "143,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1644343111,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1644343111,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,728 @@
+#####################################
+## Rfunctions.R
+#####################################
+#purpose: R-functions to support NMA in ERA for PAH analysis
+#author: RSauter1
+#created: 29/10/2019
+#last edit: 19/08/2020
+
+
+#HISTORY
+#(05/8/2020) add longitudinal argument (BOOELEAN) passed to ExtractTrialEndpoint_outer(...) to add data rowise instead of columnwise (in case of different number of repeated/longitudinal observaitons)
+#(19/08/20) add AgentName function argument to AddFormat.
+
+
+#Functions to extract data from Certara database
+#------------------------------------------------
+# GetIncidenceRate
+# GetIncidenceRateRatio
+# ExtractTrialEndpoint
+# ExtractTrialEndpoint_outer
+# ExtractTrialEndpoint_outerTrial
+# GetByArm
+# Wrap_BinaryOutcomes
+# WrapAssign_BinaryOutcomes
+# AddFormat
+
+#================
+#FUNCTIONS
+#================
+
+#GetIncidenceRate
+#------------------
+#input arguments:
+    #dat
+    #nam_event
+    #nam_py
+    #nam_ir
+#assigns ir, ir_se, ir_LL, ir_UL to data.frame and returns data.frmae
+GetIncidenceRate <- function(dat, nam_event,nam_py, nam_ir ="ir"){
+  dat[[paste0(nam_ir)]] <- dat[[paste0(nam_event)]]/dat[[paste0(nam_py)]]
+  dat[[paste0(nam_ir, "_se")]] <- dat[[paste0(nam_ir)]]/sqrt(dat[[paste0(nam_event)]]) #assumption: events follow poisson distribution with rate ir.
+  dat[[paste0(nam_ir, "_LL")]] <- exp(log(dat[[paste0(nam_ir)]])-qnorm(0.975)*dat[[paste0(nam_ir,"_se")]])
+  dat[[paste0(nam_ir, "_UL")]] <- exp(log(dat[[paste0(nam_ir)]])+qnorm(0.975)*dat[[paste0(nam_ir,"_se")]])
+  return(dat[, c(nam_ir, paste0(nam_ir, "_se"), paste0(nam_ir, "_LL"), paste0(nam_ir, "_UL"))])
+}
+
+#GetIncidenceRateRatio
+#----------------------
+# dat: data.frame
+# nam_event: name (present in dat) for number of events of binary outcome
+# nam_denom: name (present in dat) for number of exposed / denominator in binary outcome
+# nam_py:  name (present in dat) for number of person years to be used for incidence rates
+# nam_trial:  name (present in dat) for trial name
+# nam_arm:  name (present in dat) for numbered trial arms.
+#----TBD--: check that time points is the same if using longitudinal data-points of the same trial and arm!!!
+
+#Example: GetIncidenceRateRatio(datnma, "cw_n.event", "cw_n.randomized", "cw_py", "trial", "arm")
+
+GetIncidenceRateRatio <- function(dat, nam_event, nam_denom, nam_py, nam_trial, nam_arm ){
+  irr <- se_Lirr <- irr_LL <- irr_UL <- or <- se_Lor <- or_LL <- or_UL <- c()
+  for(t in 1:length(unique(dat[[paste(nam_trial)]]))){
+    #select trial t:
+    datt <- dat[which(dat[[paste(nam_trial)]]==unique(dat[[paste(nam_trial)]])[t]),]
+    #subset intervention and control arms:
+    datti <- datt[-which(datt[[paste(nam_arm)]]==1),]
+    dattp <- datt[which(datt[[paste(nam_arm)]]==1),]
+    #compute incidence rate ratio:
+    # irr_t <- c(NA, 
+    #          (datti[[paste(nam_event)]]/datti[[paste(nam_py)]])/(dattp[[paste(nam_event)]]/dattp[[paste(nam_py)]]))
+    # se_Lirr_t <- c(NA, sqrt(1/datti[[paste(nam_event)]]+1/dattp[[paste(nam_event)]]))
+    #Switch to append based on arm==1 index, as arm==1 not always the first row within trial 28FEB20:
+    irr_t <- (datti[[paste(nam_event)]]/datti[[paste(nam_py)]])/(dattp[[paste(nam_event)]]/dattp[[paste(nam_py)]])
+    irr_t <- append(irr_t, NA, after=which(datt$arm==1)-1)
+    se_Lirr_t <- sqrt(1/datti[[paste(nam_event)]]+1/dattp[[paste(nam_event)]])
+    se_Lirr_t <- append(se_Lirr_t, NA, after=which(datt$arm==1)-1)
+    irr_LL_t <- exp(log(irr_t) - qnorm(0.975)*se_Lirr_t)
+    irr_UL_t <- exp(log(irr_t) + qnorm(0.975)*se_Lirr_t)
+    #compute odds ratio:
+    # or_t <- c(NA, (datti[[paste(nam_event)]]/datti[[paste(nam_denom)]])/(dattp[[paste(nam_event)]]/dattp[[paste(nam_denom)]]))
+    # se_Lor_t <- c(NA, sqrt(1/datti[[paste(nam_event)]]+1/datti[[paste(nam_denom)]]+1/dattp[[paste(nam_event)]]+1/dattp[[paste(nam_denom)]]))
+    or_t <- (datti[[paste(nam_event)]]/datti[[paste(nam_denom)]])/(dattp[[paste(nam_event)]]/dattp[[paste(nam_denom)]])
+    or_t <- append(or_t, NA, after=which(datt$arm==1)-1)
+    se_Lor_t <- sqrt(1/datti[[paste(nam_event)]]+1/datti[[paste(nam_denom)]]+1/dattp[[paste(nam_event)]]+1/dattp[[paste(nam_denom)]])
+    se_Lor_t <- append(se_Lor_t, NA, after=which(datt$arm==1)-1)
+    or_LL_t <- exp(log(or_t) - qnorm(0.975)*se_Lor_t)
+    or_UL_t <- exp(log(or_t) + qnorm(0.975)*se_Lor_t)
+    #collect results:
+    irr <- c(irr,irr_t)
+    se_Lirr <- c(se_Lirr, se_Lirr_t)
+    irr_LL <- c(irr_LL, irr_LL_t)
+    irr_UL <- c(irr_UL, irr_UL_t)
+    or <- c(or, or_t)
+    se_Lor <- c(se_Lor, se_Lor_t)
+    or_LL <- c(or_LL, or_LL_t)
+    or_UL <- c(or_UL, or_UL_t)
+  }
+  res <- data.frame(irr,se_Lirr, irr_LL, irr_UL, or,se_Lor,  or_LL, or_UL)
+  #Replace Inf (caused by 0-events) with NA:
+  if(any(which(res==Inf))){
+    indInf <- which(res==Inf)
+    res[indInf[which(indInf<nrow(res))],] <- NA
+  }
+  # valindInf <- res[indInf[which(indInf<nrow(rr))],]
+  # valindInf[which(valindInf==Inf)] <- NA
+  # res[indInf[which(indInf<nrow(rr))],] <- valindInf
+  return(res)
+}
+
+
+
+
+
+
+
+#ExtractTrialEndpoint: Inner extraction function ---extraction of relevant data from Certara DB
+#------------------------------------------------------
+#1: get trial name, endpoint and endpoint.source
+#2: check nrow equal to narm
+#3. check endpoint.type
+#   3.1 if binary: assign n.event, n.randomized, time.exposure
+#   3.2 if continues: assign  change OR value ? (mean or median)
+#4. assign endpoint defintion.
+
+# Function arguments:
+#   trialSel <- "ambition" #character string with trial name
+#   endpointSel <- "clinical worsening" #character string with endpoint names
+#   endpoint.sourceSel <- "table s6" #character string wiht endpoint.source
+#   endpointExt <- "cw" #a character string which is used to define the endpoint-specific column name in the wide data.frame.
+
+# endpointSel <- "6mwd"
+# endpoint.sourceSel <- "table s8"
+# endpointExt <- "smwd"
+# endpoint.statSel <- "median"
+
+#TODO:
+#add an option for manual extension e.g. in case change.se is missing or if change.sd.calc needs to be extracted.
+
+ExtractTrialEndpoint <- function(data, trialSel, 
+                                 endpointSel, endpoint.sourceSel=NULL, endpoint.statSel=NULL, 
+                                 endpointExt=" ", change=NULL, 
+                                 endpoint.definitionSel=NULL,
+                                 addSelCrit=NULL, addSelCritNam=NULL){
+  if(is.null(change)){change <- 0}else{if(change=="TRUE"){change <- TRUE}}
+  #1: get trial name, endpoint and endpoint.source
+  if(is.null(endpoint.sourceSel)){
+    datt <- data %>% filter((trial == trialSel & endpoint == endpointSel))
+    if(length(unique(dat$endpoint.source))!=0){
+      message(paste("Check endpoint source for trial", trialSel, "and endpoint", endpointSel))
+      return(datt)
+    }
+  }else{
+    datt <- data %>% filter((trial == trialSel & endpoint == endpointSel & endpoint.source == endpoint.sourceSel ))
+    if(unique(datt$endpoint.type=="continuous")){
+      datt <- data %>% filter((trial == trialSel & endpoint == endpointSel & endpoint.source == endpoint.sourceSel & endpoint.stat == endpoint.statSel))
+    }
+  }
+  #filter endpoint.definition
+  if(!is.null(endpoint.definitionSel)&!is.na(endpoint.definitionSel)){
+    datt <- datt %>% filter(endpoint.definition == endpoint.definitionSel)
+  }
+  #filter for any additional criteria
+  if(!is.null(addSelCrit)&!is.na(addSelCrit)){
+    datt <- datt[which( datt[[paste(addSelCrit)]]== addSelCritNam),]
+  }
+  
+  #2: check nrow equal to narm
+  narm <- length(unique(data.frame(data)[which(data$trial == trialSel),"arm"])) #use data.frame(data) in case data is a tibble.
+  if(narm!=nrow(datt)){
+    #Replace stop with warning and address integer-check to address longitudinal data (5/8/2020)!
+    # stop("number of arms for selected endpoint is not the same as th number of trial-arms!")
+    warning("number of arms for selected endpoint is not the same as th number of trial-arms! - assume longitudinal outcome")
+    if((nrow(datt)/narm)%%1!=0){
+      warning("number of outcomes is not an integer of trial arms (assuming longitudinal outcome)!")
+    }
+    
+  }
+  #3. check endpoint.type and assign new endpoint name
+  #3.1   if binary: assign n.event, n.randomized, time.exposure,...
+  if(unique(datt$endpoint.type)=="binary"){
+    if(any(!is.na(datt$endpoint.stat))){
+      #Replace stop with warning (5/8/2020)
+      # stop("Check endpoint.stat!")
+      warning("Check endpoint.stat!")
+    }
+    datt[[paste0(endpointExt,"_n.event")]] <- datt$n.event
+    datt[[paste0(endpointExt,"_n.randomized")]] <- datt$n.randomized
+    datt[[paste0(endpointExt,"_time.exposure")]] <- datt$time.exposure
+    datt[[paste0(endpointExt,"_endpoint.definition")]] <- datt$endpoint.definition
+  }
+  #3.2   if continuous: assign  change OR value ? (mean or median)
+  if(unique(datt$endpoint.type)=="continuous"){
+    
+    if(change==TRUE){
+      datt[[paste0(endpointExt,"_change")]] <- datt$change
+      datt[[paste0(endpointExt,"_change.se")]] <- datt$change.se
+    }else{
+      datt[[paste0(endpointExt,"_value")]] <- datt$value
+      datt[[paste0(endpointExt,"_value.se")]] <- datt$value.se
+    }
+    datt[[paste0(endpointExt,"_time")]] <-    datt$time
+  }
+  
+  #Subset to relevant names
+  #datt <- datt[, selNam]
+  return(datt)
+}
+
+
+#Outer extraction function Level 2  ---extraction of relevant data from Certara DB
+#--------------------------
+# for given trial loop over list of enpoint and endpoint.source
+#(05/8/2020) add longitudinal argument (BOOELEAN) to add data rowise instead of columnwise (in case of different number of repeated/longitudinal observaitons)
+
+ExtractTrialEndpoint_outer <- function(data, EndpointArguments, longitudinal){
+  for(i in 1:nrow(EndpointArguments)){
+    if(i == 1){
+      RES <- ExtractTrialEndpoint(data = data, 
+                                  trialSel = EndpointArguments$trialSel[i], 
+                                  endpointSel = EndpointArguments$endpointSel[i],
+                                  endpoint.sourceSel = EndpointArguments$endpoint.sourceSel[i],
+                                  endpoint.statSel=EndpointArguments$endpoint.statSel[i], 
+                                  endpointExt=EndpointArguments$endpointExt[i],
+                                  change=EndpointArguments$change[i],
+                                  endpoint.definitionSel=EndpointArguments$endpoint.definitionSel[i],
+                                  addSelCrit=EndpointArguments$addSelCrit[i], 
+                                  addSelCritNam=EndpointArguments$addSelCritNam[i]
+      )
+    }else{
+      
+      #appending col with new endpoint
+      addi <-          ExtractTrialEndpoint(data = data, 
+                                            trialSel = EndpointArguments$trialSel[i], 
+                                            endpointSel = EndpointArguments$endpointSel[i],
+                                            endpoint.sourceSel = EndpointArguments$endpoint.sourceSel[i],
+                                            endpoint.statSel=EndpointArguments$endpoint.statSel[i], 
+                                            endpointExt=EndpointArguments$endpointExt[i],
+                                            change=EndpointArguments$change[i],
+                                            endpoint.definitionSel=EndpointArguments$endpoint.definitionSel[i],
+                                            addSelCrit=EndpointArguments$addSelCrit[i], 
+                                            addSelCritNam=EndpointArguments$addSelCritNam[i])
+      
+      addnam <- setdiff(names(addi), names(RES))
+      #add line: in case of NULL add all names (05/08/2020)
+      if(is.null(addnam)){addnam <- names(RES)}
+      #change to rbind in case of longitudinal==TRUE instead of cbind (05/08/2020)
+      if(longitudinal==TRUE){
+        RES <- rbind(RES, addi[, which(names(addi)%in%addnam)])
+      }else{
+        RES <- cbind(RES, addi[, which(names(addi)%in%addnam)])
+      }
+    } 
+  }
+  return(RES)
+  
+}
+
+
+#Outer extraction function Level 1 ---extraction of relevant data from Certara DB
+#----------------------------------
+#loop through trials for given list of trials and list of endpoints and list of endpoint.source
+#(05/8/2020) add longitudinal argument (BOOELEAN) passed to ExtractTrialEndpoint_outer(...) to add data rowise instead of columnwise (in case of different number of repeated/longitudinal observaitons)
+ExtractTrialEndpoint_outerTrial <- function(data, EndpointArgumentsList, longitudinal=FALSE){
+  trials <- unique(EndpointArgumentsList$trialSel)
+  RES <- c()
+  for(t in 1:length(trials)){
+    EndpointArguments_t <- EndpointArgumentsList[which(EndpointArgumentsList$trialSel==trials[t]),]
+    #(05/08/2020) add for loop - in case number of rows > 1 (with different endpoint.source)
+    if(longitudinal==TRUE){
+    for(r in 1:nrow(EndpointArguments_t)){
+      
+    Extract_t <- ExtractTrialEndpoint_outer(data=data, EndpointArguments=EndpointArguments_t[r,],
+                                            longitudinal=longitudinal)
+    
+    #check if column names are the same across tirals!
+    if(t>1){
+      if(any(!names(Extract_t)%in%names(RES))|ncol(Extract_t)!=ncol(RES)){
+        #check/add intersections of column names:
+        #add names to Extract_t:
+        if(length(which(!names(RES)%in%intersect(names(Extract_t), names(RES))))>0){
+          addnamE <- names(RES)[which(!names(RES)%in%intersect(names(Extract_t), names(RES)))]
+          Extract_t <- cbind(Extract_t, setNames(lapply(addnamE, function(x) x=NA), addnamE))
+        }
+        #add names to RES:
+        if(length(which(!names(Extract_t)%in%intersect(names(Extract_t), names(RES))))>0){
+          addnamR <- names(Extract_t)[which(!names(Extract_t)%in%intersect(names(Extract_t), names(RES)))]
+          RES <- cbind(RES, setNames(lapply(addnamR, function(x) x=NA), addnamR))
+        }
+        
+        
+      }
+      #sort by names before rbind:
+      
+      Extract_t <- Extract_t[, names(RES)]
+    }
+    RES <- rbind(RES,Extract_t)
+  } #end r
+    }else{
+      Extract_t <- ExtractTrialEndpoint_outer(data=data, EndpointArguments=EndpointArguments_t,
+                                              longitudinal=longitudinal)
+      
+      #check if column names are the same across tirals!
+      if(t>1){
+        if(any(!names(Extract_t)%in%names(RES))|ncol(Extract_t)!=ncol(RES)){
+          #check/add intersections of column names:
+          #add names to Extract_t:
+          if(length(which(!names(RES)%in%intersect(names(Extract_t), names(RES))))>0){
+            addnamE <- names(RES)[which(!names(RES)%in%intersect(names(Extract_t), names(RES)))]
+            Extract_t <- cbind(Extract_t, setNames(lapply(addnamE, function(x) x=NA), addnamE))
+          }
+          #add names to RES:
+          if(length(which(!names(Extract_t)%in%intersect(names(Extract_t), names(RES))))>0){
+            addnamR <- names(Extract_t)[which(!names(Extract_t)%in%intersect(names(Extract_t), names(RES)))]
+            RES <- cbind(RES, setNames(lapply(addnamR, function(x) x=NA), addnamR))
+          }
+          
+          
+        }
+        #sort by names before rbind:
+        
+        Extract_t <- Extract_t[, names(RES)]
+      }
+      RES <- rbind(RES,Extract_t)
+    }
+  }
+  
+  return(RES)
+}
+
+
+#Check function: sorting column names
+# t12 <- ExtractTrialEndpoint_outerTrial(data=data, EndpointArgumentsList = rbind(EndpointExtArguments1, EndpointExtArguments2))
+# t21 <- ExtractTrialEndpoint_outerTrial(data=data, EndpointArgumentsList = rbind(EndpointExtArguments2, EndpointExtArguments1))
+# t21[order(t21$trial), "smwd_change"]==t12[order(t12$trial),"smwd_change"]
+# table(t12[order(t12$trial),]==t21[order(t21$trial),names(t12)], useNA = "ifany")
+# table(t12[order(t12$trial),"prog_n.event"]==t21[order(t21$trial),"prog_n.event"], useNA = "ifany")
+
+
+
+#GetByArm
+#------------------------
+GetByArm <- function(dat, Trial){
+  res <- dat[which(dat$trial==Trial), c("trial","arm", "trtD", "trt", "cw_n.event", "cw_py")]
+  return(res)
+}
+
+
+
+# Wrap_BinaryOutcomes
+#--------------------
+#A wrapper function which computes / returns incidence rate, incidence rate ratio, odds ratio for a given outcome-name extension:
+# NamOut: name of outcome type (e.g. cw)
+# NamEvent: name of even-indicator (n.event)
+# NamExposed: name of exposed / denominator (n.randomized)
+# NamPY: name of person years (py)
+# NamTrial: name of indicator with unique trial-identifier/-names /-numbers
+# NamArm: integer with treatment arm-numbers, 1 is reference (denominator)
+# sepr="_": separator e.g.between NamOut[sepr]NamEvent, cw_n.event
+# dat: data.frame
+
+
+# NamExt <- c("cw")
+# NamEvent <- "n.event"
+# NamExposed <- "n.randomized"
+# NamPY <- "py"
+# sepr <- "_"
+
+Wrap_BinaryOutcomes <- function(NamOut, NamEvent,NamExposed,NamPY,NamTrial, NamArm, sepr="_", dat){
+  #assign name: outcome-type, outcome-name, 
+  namEv <- paste0(NamOut, sepr, NamEvent)
+  namEx <- paste0(NamOut, sepr, NamExposed)
+  namPy <- paste0(NamOut, sepr, NamPY)
+  #Compute summary statistic inlcuding S.E. and CI-95:
+  ir <- GetIncidenceRate(dat=dat, nam_event = namEv, nam_py = namPy)
+  
+  irr <- GetIncidenceRateRatio(dat, 
+                               nam_event = namEv,
+                               nam_denom = namEx,
+                               nam_py = namPy,
+                               nam_trial = NamTrial,
+                               nam_arm = NamArm)
+  
+  
+  
+  res <-list(ir,irr)
+  names(res) <- c(paste0(NamOut, "_ir"),paste0(NamOut, "_irr"))
+  return(res)
+}
+
+# WrapAssign_BinaryOutcomes
+#-------------------------
+#calls Wrap_BinaryOutcomes and then assigns the output to dat.
+#---TBD--- consider to replace hard-coded function arguments to Wrap_BinaryOutcomes
+WrapAssign_BinaryOutcomes <- function(NamOut,dat,  assignDat){
+  res <- lapply(NamOut, Wrap_BinaryOutcomes, 
+                NamEvent="n.event",
+                NamExposed="n.randomized", 
+                NamPY="py", 
+                NamTrial = "trial",
+                NamArm = "arm",
+                sepr="_",
+                dat=dat)
+  names(res) <- NamOut
+  #add newly computed IR, OR, IRR results to data.frame dat:
+  if(assignDat==TRUE){
+    for(i in 1:length(res)){
+      dat[, paste(NamOut[i], names(res[[NamOut[[i]]]][[1]]), sep="_")] <- res[[i]][[1]] #assing ir
+      dat[, paste(NamOut[i], names(res[[NamOut[[i]]]][[2]]), sep="_")] <- res[[i]][[2]] #assing irr
+    }
+    res <- dat
+  }
+  return(res)
+}
+
+
+
+
+#AddFormat: establishes data.rame-format required by R-package MBNMAdose and r-inla (by adding indicators)
+# dat: data.frame (derived from datnma, subset to relevant outcome)
+# NamOut: character name extension of relevant outcome (e.g. "cw")
+# DropZero: logical, should trials with zero-events in binary outcomes be removed from dataset.
+# binaryOut: logical,is the relevant outcome a binary variable (or continuous if FALSE).
+
+# dat <- datdeath
+# NamOut <- "death"
+#dat[which(dat$drug1.dose==0& dat$drug1!="placebo"), c("trial","cw_n.event", "drug1", "drug1.dose")]
+
+#----add smwd_change to AddFormat!!!: binary=FALSE then remove arm=1
+AddFormat <- function(dat, NamOut, DropZero=TRUE, binaryOut=TRUE, agentName="drug1", doseName="drug1.dose", approvedDoseName="approvedDose"){
+  if(!is.logical(DropZero)|!is.logical(binaryOut)){
+    stop("DropZero and binaryOut need to be TRUE or FALSE!")
+  }
+  #DROP zero event trials:
+  if(any(dat[[paste0(NamOut, "_n.event")]]==0)&DropZero==TRUE&binaryOut==TRUE){
+    warning("Removed zero-event trial to comply with MBNMADose-package requirements!")
+    dat <- dat[-which(dat$trial%in%unique(dat[which(dat[[paste0(NamOut, "_n.event")]]==0),"trial"])), ]
+  }
+  #assing expected names:
+  dat$agent <- dat[[agentName]]
+  dat$trialF <- factor(dat$trial)
+  dat$studyID <-  as.numeric(dat$trialF)
+  ## Re-compute relDose (as this now depends on drug1, drug1.dose or drug1b, drug1ab.dose) (changed 21/08/2020)
+  dat$drug1.dose <- dat[[doseName]]
+  dat$relDose <- dat$drug1.dose/dat[[approvedDoseName]]
+  dat[which(is.na(dat$relDose)& dat[[approvedDoseName]]==0), "relDose"] <- 0
+  
+  dat$dose <- dat$relDose
+  
+  
+  if(binaryOut==TRUE){
+    #subset binary outcome
+    dat$r <- dat[[paste0(NamOut, "_n.event")]] 
+    dat$N <- dat[[paste0(NamOut, "_n.randomized")]] 
+    dat$E <- dat[[paste0(NamOut, "_py")]] 
+    net <- (mbnma.network(dat[, c("trial", "studyID", "agent","drug1.dose","approvedDose","relDose", "dose", "r", "E", "N")]))
+    # undeug(mbnma.network)
+    # debug(MBNMAdose:::recode.agent)
+    # debug(add_index)
+  }else{
+    #subset continuous outcome
+    dat$y <- dat$smwd_change
+    dat$se <- dat$smwd_change.se
+    net <- mbnma.network(dat[, c("trial", "studyID", "agent","drug1.dose","approvedDose","relDose", "dose", "y", "se")])
+  }
+  #Extract network data:
+  datn <- net$data.ab
+  datn$agent <- net$agent[net$data.ab$agent]
+  datn$agentD <- net$treatment[net$data.ab$treatment] 
+  #assign as new.data:
+  dat <- datn
+  
+  #ASSIGN r-inla indicators (currently for binary data only!)
+  if(binaryOut==TRUE){
+    # dat$mean <- dat$y
+    # dat$std.err <- dat$se
+    dat$responders <- dat$r
+    dat$sampleSize <- dat$N
+    dat$exposure <- dat$E
+    dat$treatment <- factor(dat$agent, levels = unique(c("Placebo", dat$agent[which(dat$agent!="Placebo")]))) #!!!! not trtD.
+    
+    dat$trialN <-dat$studyID
+    dat$trtN <- as.numeric(dat$treatment)
+    
+    N <- nrow(dat)
+    
+    #baseline contrasts mu: corresponds to trial as is trial specific effect
+    dat$mu <- as.numeric(dat$trialN)
+    dat$mu <- as.factor(dat$mu)
+    
+    #na: number of arms in trial
+    #baseline: corresponds to treatment in arm 1 in each trial
+    dat$na <- dat$baseline <- NA
+    #Order by trial and arm: assuming that arm==1 is references (e.g. placebo)
+    dat <- dat[order(dat$trial, dat$arm),] 
+    
+    #apply(table(dat$trialN, dat$arm), FUN=sum, MAR=1)
+    for(i in 1:length(unique(dat$trialN))){
+      seli <- unique(dat$trialN)[i]
+      dat[which(dat$trialN==seli), 'na'] <- length(dat[which(dat$trialN==seli), 'na']) #dat$na==dat$armN
+      dat[which(dat$trialN==seli),'baseline'] <- dat[which(dat$trialN==seli & dat$arm==1),'trtN'][1] #see dat$trialN
+    }
+    
+    #dx.y contrasts:
+    unibase <- sort(unique(dat[["trtN"]]))
+    for (k in 2:length(unibase)) {
+      dat[[paste("d", 1, unibase[k], sep = "")]] <- rep(0, 
+                                                        N)
+      dat[[paste("d", 1, unibase[k], sep = "")]][which(dat[["trtN"]] == 
+                                                         k & dat[["baseline"]] == 1)] <- 1
+    }
+    if (length(unibase) != 2) {
+      for (k in 2:(length(unibase) - 1)) {
+        for (j in (k + 1):length(unibase)) {
+          dat[which(dat[["trtN"]] == 
+                      j & dat[["baseline"]] == k), paste("d", 
+                                                         1, unibase[k], sep = "")] <- -1
+          dat[which(dat[["trtN"]] == 
+                      j & dat[["baseline"]] == k), paste("d", 
+                                                         1, unibase[j], sep = "")] <- 1
+        }
+      }
+    }
+    
+    #Add dose for each contrast:
+    for(i in 2:(1+length(grep("d1", names(dat))))){
+      dat[[paste0("d1", i, "dose")]] <- 0
+      dat[which(dat[[paste0("d1", i)]]==1), paste0("d1", i, "dose")] <- dat$dose[which(dat[[paste0("d1", i)]]==1)]
+      #if negative contrast take dose-level of arm=1:
+      if(any(which(dat[[paste0("d1", i)]]==-1))){
+        trialSel <- dat[which(dat[[paste0("d1", i)]]==-1), "trial"]
+        for(t in 1:length(trialSel)){
+          #assign dose from arm==1:
+          dat[which(dat[[paste0("d1", i)]]==-1)[t], paste0("d1", i, "dose")] <-  dat[which(dat$trial==trialSel[t] & dat$arm==1), "dose"]
+        }
+      }
+    }
+    
+    
+    
+    #g: (count from baseline=NA to arm)
+    g <- unlist(sapply(apply(table(dat$trialN,dat$arm), MAR=1, FUN=sum), seq, from=1))-1
+    g[which(g==0)] <- NA
+    dat$g <- g
+    
+    #het: heterogeneity parameter per trial
+    dat$het <- dat$trialN
+    dat[which(dat$arm==1), 'het'] <- NA
+    #inc: inconsistency per design
+    trialDesign <- table(dat$trialN, dat$trt)
+    Unique_trialDesign <- duplicated(as.matrix(unclass(trialDesign), ncol=ncol(trialDesign), nrow=nrow(trialDesign)))
+    if(any(Unique_trialDesign==TRUE)){
+      warning("Duplicated trial designs! Adjust inc Index in dat. (relevant for r-inla using inc)")
+      
+      #Get row index with duplicated trial design:
+      dupind <- which(Unique_trialDesign==TRUE)
+      #Function to extract the rows with the same trial-design (based on dupind)
+      getRow <- function(trialDesign, dupind, x){
+        dupindRow <- trialDesign[dupind[x],]
+        res <- which(apply(trialDesign, 1, function(x) identical(x, dupindRow)))
+        res <- unname(res)
+        return(res)
+      }
+      #Generate unique list of row indexex with duplicated tiral design
+      repl_dupind <- unique(sapply( seq(1, length(dupind)), FUN=getRow, trialDesign=trialDesign, dupind=dupind))
+      #assign inconsistency random effects vector:
+      dat$inc <- dat$het
+      #replace values in $inc for entries in repl_dupind:
+      for(k in 1:length(repl_dupind)){
+        #extract inc - replace index:
+        repl_ind_inc <- which(dat$trialN%in%repl_dupind[[k]][-1]) ### WARNING! -- here the index of trialN is checked with repl_dupind but then value is assigned to "inc"
+        #remove NA
+        repl_ind_inc <- repl_ind_inc[which(!is.na(dat[repl_ind_inc, "inc"]))]
+        
+        #extract inc - lookup index:
+        look_val_inc <- dat[which(dat$trialN%in%repl_dupind[[k]][1]), "inc"]
+        #remove NA
+        look_val_inc <- look_val_inc[which(!is.na(look_val_inc))]
+        
+        #replace:
+        dat[repl_ind_inc, "inc"] <- look_val_inc
+        
+        #updated inc remaining inc index numbers:
+        val_incZero <- unique(dat[which(dat$inc>look_val_inc), "inc"])
+        for(i in 1:length(val_incZero)){
+          dat[which(dat$inc==val_incZero[i]), "inc"] <- look_val_inc[1]+i
+        }
+        
+      }
+      
+    }else{
+      dat$inc <- dat$het
+    }
+  } #end if binaryOut==TRUE
+
+  # Drug dummy coding (used for nlme::gnls(...): (added 21/08/2020)
+  for(i in 1:length(unique(dat$agent))){
+    dat[[paste0(substr(unique(dat$agent)[i],start=0,stop=3), 1)]] <- ifelse(dat$agent==unique(dat$agent)[i],1,0)
+  }
+  #Assume no drug2: ambition is the only one with a drug2
+  # for(i in 1:length(unique(dat$drug2))){
+  #   dat[[paste0(substr(unique(dat$drug2)[i],start=0,stop=3), 2)]] <- ifelse(dat$drug2==unique(dat$drug2)[i],1,0)
+  # }
+
+  return(dat)
+}
+
+
+
+# RunMBNMAdoseModels
+#--------------------
+#A warpper function to compute MBNMAdose-models assuming indpendent dose-levels and dose-response function.
+# dat: data.frame meeting data-format as required by MBNMAdose::mbnma.run(...) see also Rfunction.R AddFormat(...)
+# selLikelihood: input-argument of MBNMAdose - character
+# selLink: input-argument of MBNMAdose - character
+# selNiter: input-argument of MBNMAdose -  integer number of MCMC iterations
+# selBeta.1:  input-argument of MBNMAdose - character, relative effect, commone or random
+# selFun:  input-argument of MBNMAdose - character, dose-response function e.g. "linear", "emax"
+# selMethod: input-argument of MBNMAdose - character, "common" for fixed effect and "random" for random effect model.
+
+#Returns a list with elements: 
+#       mod_ID: mbnma-object with independent dose-response model
+#       mod_DRL: mbnma-object with dose-response function specified by selBeta.1, selFun
+#       net: network generated by calling mbnma.network(dat)
+#       IRRdat: data.frame with summary statistics of treatment effects on IRR-scale extracted from mod_ID and mode_DRL
+
+
+#Example:
+# selLikelihood <- "poisson"
+# selLink <- "log"
+# selNiter <- 50000
+# selBeta.1 <- "rel"
+# selFun <- "linear"
+# selMethod <- "common" #random for random effect
+# 
+# dat <- datcw
+# 
+# selLikelihood <- "normal"
+# selLink <- NULL
+# selFun <- "emax"
+
+RunMBNMAdoseModels <- function(dat, selLikelihood, selLink, selNiter, selBeta.1, selFun, selMethod){
+  require(MBNMAdose)
+  #Network:
+  net <- mbnma.network(dat)
+  
+  #Independent dose-levels:
+  NMA_ID <- nma.run(network=net, method = selMethod, likelihood = selLikelihood, link = selLink,
+                    warn.rhat = TRUE, n.iter = selNiter, drop.discon = TRUE, UME = FALSE)
+  
+  #Generates a forest plot for dose-response parameters.
+  p_ID <- plot(NMA_ID)
+  p_ID_data <- p_ID$data
+  #Get summary-stat on Exp-transformed iterations:
+  vals <- NMA_ID$jagsresult$BUGSoutput$sims.matrix
+  vals <- exp(vals[,grep( "d\\[", colnames(vals))])
+  sumvals <- data.frame(t(apply(vals, quantile, MAR=2, probs=c(0.025, 0.25,0.5,0.75,0.975))))
+  sumvals$mean <- apply(vals, mean, MAR=2)
+  sumvals$sd <- apply(vals, sd, MAR=2)
+  #Replace colnames
+  sumvals$treatment <-  p_ID_data$treatment[match(rownames(sumvals),rownames(p_ID_data))]
+  sumvals$model <- "ID"
+  sumvals$dose <- as.numeric(unlist(strsplit(sumvals$treatment, "_"))[seq(2, length(unique(sumvals$treatment))*2, by=2)])
+  sumvals$agent <- unlist(strsplit(sumvals$treatment, "_"))[seq(1, length(unique(sumvals$treatment))*2, by=2)]
+  sumvals$agent <- factor(sumvals$agent)
+  sumvals$treatment <- factor(sumvals$treatment)
+  
+  #Linear dose-response function:
+  NMA_DRL <- mbnma.run(network=net, method = selMethod, likelihood = selLikelihood, link = selLink,
+                       beta.1=selBeta.1, fun=selFun, warn.rhat = TRUE, n.iter = selNiter)
+  
+  #Prediction
+  pred_DRL <- predict(NMA_DRL, E0=1, exact.doses = rep(list(seq(0,1,0.1)), length(net$agents)))
+  p_DRL <- plot(pred_DRL, disp.obs = TRUE, network=net,overlay.split = TRUE)
+  p_DRL_data <- p_DRL$data
+  p_DRL_data$model <- "DRL"
+  p_DRL_data$treatment <- p_DRL_data$agent
+  names(p_DRL_data)[grep("\\%", names(p_DRL_data))] <- names(sumvals)[grep("X", names(sumvals))]
+  dat <- merge(p_DRL_data, sumvals, all=TRUE)
+  
+  #res
+  res <- list(NMA_ID, NMA_DRL, dat, net)
+  names(res) <- c("mod_ID", "mod_DRL", "IRRdat", "net")
+  return(res)
+}
+
+
+
+
+
+##################Functions######################
+
+#for ORs
+logit <- function(p,percent=FALSE) {
+  if (percent==TRUE) {
+    p <- p/100
+  } 
+  x <- log(p/(1-p))
+  return(x)
+}
+
+inv.logit <- function(x,percent=FALSE) {
+  p <- exp(x)/(1+exp(x))
+  if (percent==TRUE) {
+    p <- 100*p
+  }
+  return(p)
+}
+
+#for HRs (same as complementary log-log)
+llS <- function(p,percent=FALSE) {
+  if (percent==TRUE) {
+    p <- p/100
+  } 
+  x <- log(-log(1-p))
+  return(x)
+}
+
+inv.llS <- function(x,percent=FALSE) {
+  p <- 1-exp(-exp(x))
+  if (percent==TRUE) {
+    p <- 100*p
+  }
+  return(p)
+}
+
+##################################################
+
+
+#

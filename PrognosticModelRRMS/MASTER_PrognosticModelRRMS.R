@@ -182,3 +182,5 @@ source("R/dca.fun.R")
 SMSCdataC$outcome2<-as.numeric(SMSCdataC$outcome)-1
 SMSCdataC$PrognosticModel<-SMSCdataC$Risk
 dca.fun(data=SMSCdataC, outcome="outcome2", predictors="PrognosticModel", xstop = 0.4)
+
+rm(list=ls())

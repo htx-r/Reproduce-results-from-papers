@@ -21,6 +21,8 @@ RiskData$logitp2<-RiskData$logitp+lp2$linear.predictors
 app_cstat_model2 <- roc(outcome~logitp2,data=RiskData)
 app_cstat_model2$auc #0.5763
 glm(outcome~logitp2,family="binomial",data=RiskData) #c-intercept=-0.09, c-slope=0.84
+RiskData$Risknew2<-exp(RiskData$logitp2)/(1+exp(RiskData$logitp2))
+
 
 #method3 - update of the intercept and the slope
 lp3 <- lrm.fit (y=RiskData$outcome, x=RiskData$logitp)
@@ -28,6 +30,8 @@ RiskData$logitp3<-coef(lp3)[1]+coef(lp3)[2]*RiskData$logitp
 app_cstat_model3 <- roc(outcome~logitp3,data=RiskData)
 app_cstat_model3$auc #0.5763
 glm(outcome~logitp3,family="binomial",data=RiskData) #c-intercept=0.0, c-slope=1
+RiskData$Risknew3<-exp(RiskData$logitp3)/(1+exp(RiskData$logitp3))
+
 
 full <- lrm(outcome~age+disease.duration+edss+nr.Gd.enhanced.lesions+nr.relapses.2y.prior.study1+nr.relapses.2y.prior.study2+months.since.last.relapse+treatment.naive.prior.visit+gender,data=RiskData, x=T, y=T)
 #method 4 - recalibration and selective re-estimation

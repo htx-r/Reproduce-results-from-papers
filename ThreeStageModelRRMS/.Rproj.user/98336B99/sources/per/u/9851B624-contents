@@ -1,0 +1,22 @@
+library(readxl)
+output$plot <- renderPlot({
+  ggplot(data(), aes(x=`Baseline risk`, y=`Predicted probability of relapsing within the next two years %`, group=Treatment)) +
+    geom_line(data=data(),mapping=aes(color=Treatment))+geom_vline(xintercept=0.1265625, linetype="dashed", color = "red")+
+    geom_vline(xintercept=0.7040377, linetype="dashed", color = "red")+
+    geom_point(data=data(),mapping=aes(color=Treatment))+geom_vline(xintercept=risk.score(), color="blue")+labs( x="Baseline risk")+labs( y="Probability of relapsing within the next two years")+
+    geom_ribbon(aes(xmin=0, xmax=0.1265625), alpha=0.10, fill="grey70")+  geom_ribbon(aes(xmin=0.7040377, xmax=1), alpha=0.10, fill="grey70")+
+    theme_minimal()
+  
+  output$plot <- renderPlot({
+    ggplot(data(), aes(x=`Baseline risk`, y=`Predicted probability of relapsing within the next two years %`, group=Treatment)) +
+      geom_line(aes(color=Treatment))+geom_vline(xintercept=0.1265625, linetype="dashed", color = "red")+
+      geom_vline(xintercept=0.7040377, linetype="dashed", color = "red")+
+      geom_point(aes(color=Treatment))+geom_vline(xintercept=risk.score(), color="blue")+labs( x="Baseline risk")+labs( y="Probability of relapsing within the next two years")+
+      geom_ribbon(aes(xmin=0, xmax=0.1265625), alpha=0.10, fill="grey70")+  geom_ribbon(aes(xmin=0.7040377, xmax=1), alpha=0.10, fill="grey70")+
+      theme_minimal()
+  output$plot <- renderPlot({
+    ggplot(data(), aes(x=`Baseline risk score`, y=`Predicted probability to relapse within the next 2 years %`, group=Treatment)) +
+      geom_line(aes(color=Treatment))+
+      geom_point(aes(color=Treatment))+geom_vline(xintercept=risk.score(), color="blue")+labs( x="Baseline risk score")+labs( y="Predicted probability to relapse within the next 2 years %")+
+      theme(text = element_text(size = 14))# theme(axis.text.x = element_text(size = 20, angle = 90, hjust = .5, vjust = .5, face = "plain"),
+    
