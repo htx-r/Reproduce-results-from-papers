@@ -1,0 +1,1053 @@
+---
+title: Meta-analytic predictive priors for all-cause mortality hazard rates in a new
+  trial 
+author: "Konstantina Chalkou"
+date: "14th July 2022"
+output:
+  word_document:
+    toc: yes
+    toc_depth: '6'
+  html_document:
+    theme: cerulean
+    body_placement: left
+    toc: yes
+    toc_depth: 6
+    toc_collapsed: no
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100% !important;
+  margin-left: 0%;
+  margin-right: 0%;
+  text-align: justify;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  $items = $('div#TOC li');
+  $items.each(function(idx) {
+    num_ul = $(this).parentsUntil('#TOC').length;
+    $(this).css({'text-indent': num_ul * 10, 'padding-left': 0});
+  });
+
+});
+</script>
+
+<style>
+  .superbigimage{
+      overflow: scroll !important;
+      white-space: nowrap;
+      max-width: 1600px;
+      max-height: 700px;
+  }
+
+  img{
+     max-width: 1000%;
+     max-height: 1000%;
+  }
+
+
+</style>
+
+
+```{css toc-content, echo = FALSE}
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+
+div.tocify {
+  width: 40%;
+  max-width: 450px;
+}
+```
+<div align="justify">
+```{r include= FALSE}
+###Libraries
+library("pmsampsize")
+library("rms")
+library("survival")
+library("readxl")
+library("R2jags")
+library("ggplot2")
+library("survminer")
+library("dplyr")
+
+
+#set directory and load the needed data. working directory needs to be changed manually:
+working_directory <- "C:/Users/KChalkou/OneDrive - JNJ/Desktop/MAP project/Work on IPD PAH/IPD/Report/Codes"
+setwd(working_directory)
+load("data.RData") # I used the data, which are available here: 
+load("Scenario1_Results.RData")
+load("Scenario2_Results.RData")
+load("Scenario3_Results.RData")
+load("Results_Comparison_BinomialvsPoisson.RData")
+
+
+```
+## Introduction
+<font size="+1"> 
+ &nbsp; Meta-analytic predictive (MAP) prior method is a recently developed method, which borrows information from similar, past and completed clinical trials to inform the control arm of a new trial. The goal of MAP method is to summarize the available information from past trials into a Bayesian framework and then inform a new trial's arm. Fewer patients are then needed in the control arm of the new trial. MAP can also lead to reduced mean squared error, increased power, and reduced type I error within the new trial.<sup>1,2,3</sup> <br />
+  &nbsp; In a first step, a meta-analysis is performed for the outcome of interest. Let us assume we have a new trial that randomizes patients into treatment A (control arm) and treatment B (active arm). And let us also assume that we want to estimate the hazard ratio for all-cause mortality for treatment B vs treatment A. 
+The MAP method uses historical studies, which include treatment A: <br />
+Historical study 1: **Treatment A**, Treatment C <br />
+Historical study 2: Treatment D, **Treatment A** <br />
+Historical study 3: **Treatment A**, Treatment E <br />
+<br />
+&nbsp; Assuming exchangeable hazard rate across arms, meaning that the true hazard rates come from the same distribution, a random-effects meta-analysis model<sup>4</sup> can be performed: <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=8, fig.height=7, fig.align='center'}
+library(ggplot2)
+## Data needed for making the forest plot
+Hypothetical_Scenario<- data.frame(arm=c('MAP', 'Mean', 'Treatment A from Study 3', 'Treatment A from Study 2', 'Treatment A from Study 1'),
+index=1:5,
+                                                Hazard=c(0.05,0.05,0.04,0.07,0.05),
+                                                lower=c(0.01,0.02,0.02,0.05,0.03),
+                                                upper=c(0.09,0.08,0.06,0.09,0.07))
+
+
+### Forest plot
+Hypothetical_Scenario_plot<-ggplot(data=Hypothetical_Scenario, aes(y=index, x=Hazard, xmin=lower, xmax=upper)) +
+  geom_point(size=3,color=c("#000066","#000066","black", "black","black")) + 
+  geom_errorbarh(linetype=c("solid","solid","dashed","dashed","dashed"),size=0.6,height=.2, color=c("#000066","#000066","black", "black","black")) +
+  scale_y_continuous(breaks=1:nrow(Hypothetical_Scenario), labels=Hypothetical_Scenario$arm) +
+  labs(title='Hazards for Treatment A', x='Hazards (yearly)', y = 'Arm') + xlim(0,0.1)+
+  theme(
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(
+      fill = "grey90",
+      colour = "black",
+      size = 1
+    )
+  )+
+  geom_rect(aes(ymin = 0.5, ymax = 2.5, xmin=-Inf, xmax=Inf), fill = "light blue", alpha=0.05)
+
+Hypothetical_Scenario_plot
+```
+<br />
+&nbsp; Having the population mean effect size (Mean), its variance, and the variation of the true effects (tau), as estimated via the random-effects meta-analysis, we can estimate the MAP. The MAP is defined as the interval within which the effect size of a new study would fall if this study was selected at random from the same population of the studies already included in the meta-analysis.<sup>5</sup> Finally, the MAP can be used as a prior in the new trial to inform further the Treatment A arm.<sup>1,2,3</sup> <br />
+
+## Objective
+
+<font size="+1">
+
+
+ &nbsp; This project aims to predict the all-cause mortality hazard rates in patients with pulmonary arterial hypertension (PAH), in a new trial (e.g., UNISUS), using available information from past studies. PAH patients can be treatment naive, treated with a PAH specific therapy (PDE5i, ERA, prostacyclin analogues), or treated with a combination of them. Then, a MAP prior will be derived, which can be used to inform further a new trial's arm.
+
+
+## Data
+
+<font size="+1">
+
+ &nbsp; The UNISUS trial is a new trial, within which patients are randomized into macitentan 10 mg (control arm) and macitentan 75 mg (active arm). Our aim is to inform the all-cause mortality hazard of macitentan 10 mg arm in UNISUS trial. <br />
+&nbsp; We will use information from past trials:<br />
+1) We have patient-level data from four historical studies: **GRIPHON**, **TRITON**, **SERAPHIN**, and **COMPASS-2**. The data are available here: https://jnj.sharepoint.com/teams/EXPOSUREPSW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=5fuElB&cid=c1521f38%2D7cff%2D4a3e%2D83d5%2D0d1daa92519a&RootFolder=%2Fteams%2FEXPOSUREPSW%2FShared%20Documents%2FCARE%20PAH%2FUNISUS%2BCARE%20PAH%2FPrognostic%5Ffactors%2FData%2Fcombined%20data&FolderCTID=0x012000F4A4742ED91EFE46BB4D3558E4DE7773. <br />
+The following table (Table 1) presents the studies, the arms, and the corresponding categorization of treatments (ERA, PDEi5, or Prostacyclin). <br />
+
+
+***Table 1. Completed available trials with PAH patients, the corresponding treatment categorization, and the number of patients included in each study and arm. ***  <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+STUDY<-as.data.frame(cbind(c("GRIPHON (AC-065A302) (N=1152)", "TRITON (AC-065A308) (N=246)", "COMPASS-2 (AC-052-414) (N=334)", "SERAPHIN (AC-055-302)(N=742)")))
+Control_arm<-as.data.frame(cbind(c("Placebo (n=577)", "Placebo & Macitentan & Tadalafil (n=127) (ERA & PDE5i)", "Sildenafil & Placebo (n=175) (PDE5i)", "Placebo (n=250)")))
+Active_Treatment1<-as.data.frame(cbind(c("Selexipag (n=575) (Prostacyclin analog)", "Macitentan & Tadalafil & Selexipag (n=119) (ERA & PDE5i & Prostacyclin analog)", "Sildenafil & Bosentan (n=159) (PDE5i & ERA)", "Macitentan 3 mg (n=250) (ERA)")))
+Active_Treatment2<-as.data.frame(cbind(c("-", "-", "-", "Macitentan 10 mg (n=242) (ERA)")))
+
+table1<-as.data.frame(cbind(STUDY, Control_arm, Active_Treatment1, Active_Treatment2))
+colnames(table1)<-c("Study", "Control arm", "Active arm 1", "Active arm 2")
+
+kable(table1,caption="Studies with patient-level information")
+
+```
+<br />
+2) We also have summary-level data from published studies. The AMBITION trial<sup>6</sup> was a multicenter, randomized, double-blind, phase 3–4 study. For the all-cause mortality analyses, we used published information from a paper which followed AMBITION study, aiming at analyzing survival data from the AMBITION trial.<sup>7</sup>
+The ARIES-E study<sup>8</sup> was a long-term extension study for patients in the ARIES-1 and -2 studies. The objective of the ARIES-E study was to collect long-term safety and efficacy data for PAH patients receiving ambrisentan. <br /> The following table (Table 2) presents the treatment arms included in each one of these studies, the categorization of treatment, and the number of patients included in each study and arm.<br />
+
+***Table 2. Studies with summary-level published information about all-cause mortality, the treatment arms included in each one of them, the categorization of treatment, and the number of patients included in each study and arm.***  <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+STUDY<-as.data.frame(cbind(c("AMBITION (N=605)", "ARIES-E (N=383)")))
+Control_arm<-as.data.frame(cbind(c("Ambrisentan 10 mg (n=152) (ERA)", "Ambrisentan 2.5 mg (n=96) (ERA)")))
+Active_Treatment1<-as.data.frame(cbind(c("Tadalafil 40 mg (n=151) (PDE5i)", "Ambrisentan 5 mg (n=190) (ERA)")))
+Active_Treatment2<-as.data.frame(cbind(c("Ambrisentan 10 mg & Tadalafil 40 mg (n=302) (ERA & PDE5i)", "Ambrisentan 10 mg (n=97) (ERA)")))
+
+table2<-as.data.frame(cbind(STUDY, Control_arm, Active_Treatment1, Active_Treatment2))
+colnames(table2)<-c("Study", "Control arm", "Active arm 1", "Active arm 2")
+
+kable(table2,caption="Studies with published summary-level information")
+
+```
+
+__Note__:  <br /> 
+CARE PAH, which is an observational study, can also be used in the future (when the study is completed). Patients, who will be under macitentan 10 mg can inform the macitentan 10 mg arm in UNISUS trial.
+
+
+## Methods
+
+<font size="+1">
+
+ &nbsp; We aim to use the MAP method in three Scenarios, which are below detailed. <br /> 
+ 
+### Scenario 1
+
+&nbsp; We can assume that all (or some) treatment arms' all-cause mortality hazard rates, **with patient-level data** (Table 1), are exchangeable  and meta-analyze them to inform macitentan 10 mg from UNISUS trial. ***The MAP, in this scenario, will be the prediction of the all-cause mortality hazard rates in a new trial, which will include one of these arms***, assuming that the all-cause mortality hazard rates are exchangeable between these arms. <br /> 
+The following Figure presents the survival curves per arm. <br />
+
+***Figure 1. Comparison of survival probabilities per arm in each study.*** <br /> 
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+fit<-survfit( Surv(EV.YEARS, EV.EVENT) ~ group, data = data )
+plot_arms<-ggsurvplot(fit,data=data, size=1,
+           pval = FALSE, conf.int = FALSE, palette = "Set1",ggtheme = theme_bw(base_size=7))+xlab("Time (Years)")
+library(survival)
+library(survminer)
+ggpar(plot_arms, 
+      font.main = c(12, "bold"),
+      font.x = c(12, "bold"),
+      font.y = c(12, "bold"),
+      font.caption = c(7, "bold"), 
+      font.legend = c(4), 
+      font.tickslab = c(7, "bold"))
+```
+<br /> 
+
+### Scenario 2
+
+&nbsp; We can assume that all ERA treatments' hazard rates for all-cause mortality are exchangeable. In this case, we can use all ERA treatments and meta-analyze their hazard rates. Hence, we can use macitentan 3 mg, and macitentan 10 mg from SERAPHIN study (Table 1). Here, we will include only the treatment naive patients to ensure that patients are under an ERA treatment during the trial, as in SERAPHIN study patients continued taking the PAH treatment at baseline and macitentan 3 mg or 10 mg.
+We can also include summary-level data from published studies: ARIES-E and AMBITION studies, which include ambrisentan (another ERA treatment) (Table 2).<br />
+***The MAP, in this scenario, will be the prediction of all-cause mortality hazard rates in a new trial, whose patients will take an ERA treatment (as macitentan 10 mg).***<br />
+&nbsp; In Figure 2, the survival probabilities for macitentan 10 mg and macitentan 3 mg from the SERAPHIN study are presented. <br />
+
+***Figure 2. Survival probabilities for macitentan 10 mg and macitentan 3 mg from the SERAPHIN study.***  <br />
+<br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+data5<-data[which(data$group=="SERAPHIN_Macitentan10" | data$group=="SERAPHIN_Macitentan3" ),]
+fit5<-survfit( Surv(EV.YEARS, EV.EVENT) ~ group, data = data5)
+plot5<-ggsurvplot(fit5,data=data5, size=1,conf.int = TRUE,
+                  pval = FALSE,  palette = "Set1",ggtheme = theme_bw(base_size=8))+xlab("Time (Years)")     
+
+library(survival)
+library(survminer)
+ggpar(plot5, 
+      font.main = c(12, "bold"),
+      font.x = c(12, "bold"),
+      font.y = c(12, "bold"),
+      font.caption = c(7, "bold"), 
+      font.legend = c(4), 
+      font.tickslab = c(7, "bold"))
+
+```
+<br />
+
+### Scenario 3
+&nbsp; In scenario 3, we will extend scenario 1, by using all the information coming from **patient-level data and summary-level published information**. Specifically, we will use all the patient-level information from Table 1, and all the summary-level published data presented in Table 2. 
+***The MAP, in this scenario, will be the prediction of all-cause mortality hazard rates in a new trial, whose patients will take any of the included PAH treatments***. In this scenario, we  use all the available information from completed trials, assuming that the all-cause mortality hazard rates are exchangeable between these arms. <br />
+
+### Adjustment for baseline prognostic factors
+&nbsp; We will adjust for the most important factors (collected at baseline), which are known to influence the all-cause mortality (based on explorative assessment of pronostic factors for all-cause mortality in historical PAH trials, see here: https://jnj.sharepoint.com/teams/EXPOSUREPSW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=5fuElB&cid=c1521f38%2D7cff%2D4a3e%2D83d5%2D0d1daa92519a&FolderCTID=0x012000F4A4742ED91EFE46BB4D3558E4DE7773%2E%20The%20following%20table%20presents%2C%20the%20studies%2C%20the%20arms%2C%20and%20the%20corresponding%20categorization%20of%20treatments%20%28ERA%2C%20PDEi5%2C%20or%20Prostacyclin%29%2E%20Table%201%2E%20Completed%20available%20trials%20with%20PAH%20patients%2C%20the%20corresponding%20treatment%20categorization%2C%20and%20the%20number%20of%20patients%20included%20in%20each%20study%20and%20arm%2E&id=%2Fteams%2FEXPOSUREPSW%2FShared%20Documents%2FCARE%20PAH%2FUNISUS%2BCARE%20PAH%2FPrognostic%5Ffactors%2FReport&viewid=cf6b8cc6%2D2e08%2D4591%2Da3e0%2De0766a88b3a7https://jnj.sharepoint.com/teams/EXPOSUREPSW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=5fuElB&cid=c1521f38%2D7cff%2D4a3e%2D83d5%2D0d1daa92519a&FolderCTID=0x012000F4A4742ED91EFE46BB4D3558E4DE7773%2E%20The%20following%20table%20presents%2C%20the%20studies%2C%20the%20arms%2C%20and%20the%20corresponding%20categorization%20of%20treatments%20%28ERA%2C%20PDEi5%2C%20or%20Prostacyclin%29%2E%20Table%201%2E%20Completed%20available%20trials%20with%20PAH%20patients%2C%20the%20corresponding%20treatment%20categorization%2C%20and%20the%20number%20of%20patients%20included%20in%20each%20study%20and%20arm%2E&id=%2Fteams%2FEXPOSUREPSW%2FShared%20Documents%2FCARE%20PAH%2FUNISUS%2BCARE%20PAH%2FPrognostic%5Ffactors%2FReport&viewid=cf6b8cc6%2D2e08%2D4591%2Da3e0%2De0766a88b3a7).  <br />
+a.	WHO functional class (3 categories, 1: “I or II”, 2: “III”, 3: “IV”.) <br />
+b.	6 minutes walk test assessment (numerical)<br />
+c.	treatment naïve (binary: No, Yes), defined as no ERA, PDE5i, PGI2, or SGCS before starting the trial’s therapy <br />
+d.	number of months from PAH diagnosis assessment to start of treatment (numerical)<br />
+e.	age (numerical)<br />
+f.	biological sex (binary: Female, Male)  <br />
+
+&nbsp; We will check, under each of the scenarios, how many variables can be included based on the sample size we have, in order to avoid overfitting: <br />
+a.	We will check the one in ten rule of thumb (Events per variable (EPV)>10)<sup>9</sup> <br />
+b.	We will also check Riley’s et. al. method<sup>10</sup> with *pmsampsize* in R.<br /> 
+&nbsp; Riley et. al. suggested a method to calculate the minimum sample size for prognostic multivariable models development. The sample size needs to meet the following three criteria: (i) small optimism in predictor effect estimates as defined by a global shrinkage factor of ≥0.9, (ii) small absolute difference of ≤ 0.05 in the model's apparent and adjusted Nagelkerke's R2, and (iii) precise estimation of the overall risk in the population. Criteria (i) and (ii) aim to reduce overfitting.<sup>10</sup> This method can be also used reversed: estimation of the maximum number of prognostic factors based on the available sample size.
+
+**The incorporation of baseline factors in the analysis will allow us to make more accurate predictions for a new trial with known baseline factors of the included patients.**
+
+__Note__: Initially, we wanted also to include the variable “Baseline value of NT-pro BNP assessment”. However, we excluded this variable from the analysis, because of many patients with missing values in this variable (315 out of 2466 patients). In addition, we noticed that if we exclude the patients with missing values in this variable from the analysis, then the hazard rates for SERAPHIN study are underestimated (27% of the patients with missing data in NT-pro BNP assessment in SERAPHIN have also died), as presented in Figure 4.<br />
+
+***Figure 4. Hazard rates per study for all patients (upper graph), and hazard rates per study only for patients with complete information in Baseline value of NT-pro BNP assessment (graph at the bottom)*** <br />
+<br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+ggarrange(per_study_plot_all_cases,per_study_plot_complete_cases_withBNBL, nrow=2, ncol = 1)
+```
+
+
+### Distribution for survival curves <br />
+&nbsp; We will compare the fit of parametric models, i.e., Weibull, Exponential and log-normal distributions, with the Kaplan-Meier survival curves. <br />
+&nbsp; After the selection of the proper parametric distribution for the all-cause mortality hazard rates, we aim to use the RBesT package<sup>11</sup> for comparison reasons. RBesT is the main package which is used for MAP methods. We will compare the RBesT results with the results from our meta-analysis to see whether the selection of parametric model  influences the results. More specifically, we will insert in **RBesT gMAP** function the log-hazard rates as the log of $$events_j/(patientyears_j)$$ and their standard errors as $$\sqrt{1/events_j}$$ in each arm j. Then, using this information, gMAP function from RBesT performs a random-effects meta-analysis estimating the mean of the meta-analysis and the MAP for a new study.   
+
+__Note__: RBesT package can be used with summary-level data, without offering the ability of using patient-level data. Hence, we cannot estimate the within-arms regression coefficients of baseline factors using RBesT. For this reason, we will use this package for comparison reasons and for estimating the operating characteristics, but not for the meta-analysis model.
+
+
+### Meta-analysis and meta-regression models
+
+&nbsp; Meta-analysis models will be developed in a Bayesian framework, where the all-cause mortality hazard rates per arm will be assumed exchangeable across arms (i.e., random-effects meta-analysis). In this case, we assume that the true all-cause mortality log-hazard rates per arm follow the same normal distribution, with mean **Mean** and heterogeneity between arms **tau**. <br />
+&nbsp; Meta-regression models will be also developed in a Bayesian framework, where the all-cause mortality hazard rates per arm will be assumed exchangeable across arms. The regression coefficients of the baseline factors will be assumed fixed across arms. Here, we assume that the true all-cause mortality log-hazard rates per arm follow the same normal distribution, with mean **Mean** and heterogeneity between arms **tau**, and the true regression coefficients are the same across arms (i.e., the influence of each baseline factor is the same regardless of the arm). <br />
+
+#### Meta-analysis combining patient and summary level data
+
+&nbsp; As described before, in scenario 2 and scenario 3, we will combine patient-level data with summary-level published data. To combine these different kind of data sources, in a Bayesian framework, we will use the method described by Saramago et. al.<sup>12</sup> 
+This method, uses three levels. In a first level, a parametric model (e.g., exponential, or Weibull, or log-normal) is used to estimate the rate (lambda<sub>j</sub>) in each arm j, using the patient-level data. In a second level, a Binomial distribution for the events (r<sub>j</sub>) in each arm can be assumed: <br /> 
+$$Binomial(F_j,n_j)$$ <br />
+where F<sub>j</sub> is the cumulative distribution function of the event probability (which is connected with the first level), and n<sub>j</sub> represents the number of patients in arm j.
+For example, when an exponential distribution is assumed in the first level, then<sup>13</sup> $$F_j=1-e^(-lambda_j*time_j)$$  In a third level, the estimated lambda<sub>j</sub> for each arm are assumed exchangeable and are combined in a random-effects meta-analysis. <br />
+
+__Note__: When the time is pre-defined for data collection, and thorough follow-up is undertaken in the trial, then t<sub>j</sub> depicts the total follow-up time. However, when follow-up time varies by patients the median follow-up time could better approximate the hazard rates in the trial.
+
+### Operating characteristics
+&nbsp; We will use the package RBesT<sup>11</sup>  to estimate the operating characteristics for MAP (power, effective sample size, etc.) under all the scenarios. <br />
+
+&nbsp; First, we will use the function **automixfit** to **approximate with a parametric representation the MAP prior**. The MAP prior is not known analytically but only available as an MCMC sample. Hence, approximations of the MAP prior could be used, for example, by matching a multivariate normal distribution with the same means, SD, and correlations; or, mixture approximations to the MAP priors. The latter can be performed using the **automixfit** function. **automixfit** function selects the number of mixture components automatically based on information criteria measures (AIC). This function fits a parametric mixture representation using the expectation maximization algorithm. <br />
+
+&nbsp; Then, we will estimate the effective sample size due to the MAP use. When designing a new trial, knowing the amount of information introduced by the MAP prior is useful. It is sometimes expressed as the prior effective sample size (ESS), or, in the time-to-event setting, the **effective number of events (ENE)**. The ESS (or ENE) is not simply the number of patients (or events) meta-analyzed in all the historical trials. The total number of patients (or events) is down-weighted based on the number of historical trials used and the between studies heterogeneity (tau). The function **ess** in RBesT will be used to estimate the ENE for the estimated MAP priors. More specifically, the expected local-information-ratio (ELIR) method will be used for the ENE estimation. ELIR is a recent method for the ESS estimation, which is preferred in MAP methodology, to other methods as performs better giving more stable results.<sup>14</sup> ELIR uses the prior and Fisher information. However, instead of locally evaluating the respective information ratio at the mean or mode (as other ESS methods), it is defined as the mean of the prior information to the Fisher information ratio r(θ)
+
+$$ESS=E_𝜗[{r(𝜗)}]=E_𝜗[{i(p(𝜗))/i_F(𝜗)}]$$
+__Note__:$$i_F(𝜗)$$ is the expected Fisher information for one unit information. <br />
+
+&nbsp; The prior effective sample size of the MAP
+prior can be used as a measure of additional informativeness for the sample size in the new trial. Then the total sample size using MAP can be calculated as follows:
+$$ESS(total)=ESS(prior)+SampleSize(new trial)$$ 
+<br />
+
+&nbsp; In addition, a **robustification** of the MAP prior<sup>2</sup> is recommended to ensure sensible inference when there is a data-prior conflict, i.e., the new trial data and MAP prior deviate from one another.<sup>11</sup> Robustification adds a weakly-informative prior component to the mixture derived before. To do so, we will use the *robustify* function, in which a weight w needs to be specified. This weight w may be interpreted as the prior probability that the source information is not relevant for the target, expressing some degree of skepticism towards the agreement between the MAP and the new trial.<sup>11</sup> The usual weights used are 10% to 20%, as higher values indicate that the MAP use should be questionable. 
+
+&nbsp; Finally, we will estimate and compare the **power** with and without the historical trials incorporation using MAP, in UNISUS trial. In UNISUS trial, 130 all-cause deaths were estimated until the end of study, with a hazard ratio of 0.70 for macitentan 75 mg vs macitentan 10 mg, and one-sided significance level equal to 0.05. We will use the aforementioned information in **oc1S** and **decision1S_boundary** functions from the RBesT package to estimate the power in UNISUS trial without MAP incorporation and with MAP incorporation.<br />
+
+__Note__: The probability of success (PoS) for a new trial, in an interim analysis, can be also estimated using RBesT package, giving the observed hazard-ratio, and the number of events in the interim time point.
+
+### Implementation and software <br />
+&nbsp; All our analyses will be done in R.<sup>15</sup> The meta-analysis and meta-regression models will be fitted in a Bayesian framework and
+we will use self-programming routines in the *R2Jags* package.<sup>16</sup>
+We will set a normal distribution (N(0, 1000)) as prior distributions for all of the model parameters, and Half-normal(0, 1) for the between arms heterogeneity (tau). We will simulate two chains of 150.000 samples, while discarding the first 1000 samples and thinning for every 10 samples. The model's convergence will be checked based on autocorrelation plots, the visualization of the chain convergence, and the Rhat values. <br />
+&nbsp; All the analyses codes, for this project, will be available here:<br /> https://jnj-my.sharepoint.com/personal/kchalkou_its_jnj_com/_layouts/15/onedrive.aspx?id=%2Fteams%2FEXPOSUREPSW%2FShared%20Documents%2FCARE%20PAH%2FUNISUS%2BCARE%20PAH%2FMAP%2FCodes%20Analyses&listurl=https%3A%2F%2Fjnj%2Esharepoint%2Ecom%2Fteams%2FEXPOSUREPSW%2FShared%20Documents&viewid=cf6b8cc6%2D2e08%2D4591%2Da3e0%2De0766a88b3a7
+
+## Results <br />
+
+### Scenario 1
+
+&nbsp; First, we compared the most used parametric distributions (exponential, Weibull, and log-normal) for time-to event data with the Kaplan-Meier survival curves. In Appendix Section 1 the comparison between exponential, Weibull, log-normal and Kaplan-Meier survival curves per arm are presented. The exponential distribution performed better than or similar to the the other two distributions. Therefore, all our analyses were performed in a Bayesian framework using the parametric exponential distribution for the patient-level data.
+
+&nbsp; In Figure 1 all the arms' all-cause mortality survival curves were presented. The triple therapy from TRITON trial (i.e., selexipag & macitentan & tadalafil) had much higher survival curve than the other arms, something that indicated that this arm might cause high heterogeneity in the meta-analysis. This is in an agreement with the random-effects meta-analysis results presented in Figure 5. The heterogeneity between the arms was **tau=0.31** and meta-analysis results along with the MAP prediction are presented in Figure 5.<br />
+
+***Figure 5. Meta-analysis and MAP using all the arms. The results shown are from the random-effects meta-analysis.*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot
+```
+<br />
+&nbsp; To decrease the heterogeneity caused by the triple therapy in TRITON trial, we included a study-level factor: triple therapy (Yes vs No). Keeping this trial in the analysis, instead of excluding it from the analysis, allowed for using further information about the within study influence of the baseline factors. The heterogeneity between the arms dropped to **tau=0.12**. The subgroup meta-analysis results along with the MAP prediction are presented in Figure 6. __Note__: The presented results are only for studies that do not include patients under the triple therapy (triple therapy=0). <br />
+
+***Figure 6. Meta-analysis and MAP using all the arms, adjusting for triple therapy in TRITON trial. The results shown are from the random-effects meta-analysis.*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario1
+```
+
+#### Comparison with RBesT results
+
+&nbsp; As we described in the methods section: "Distribution of survival curves", we used the RBesT package and the gMAP funtion to compare our results and to check how sensitive they are on the exponential parametric model selection. The RBesT results give a MAP estimation equal to **0.076, with 95% CrI (0.049, 0.115)**, which is very similar to our estimation of **0.079, with 95% CrI (0.054, 0.112)**. <br />
+
+&nbsp; As the results were very similar, using different methods, it seems that the choice of the parametric model does not influence the final results.
+
+
+#### Baseline prognostic factors
+ 
+#### Events per variable (EPV)
+&nbsp; The available dataset included in total 423 patients, which died. Based on the ten rule of thumb we can include maximum 42 predictors.<br />
+
+#### Riley's et. al. method
+
+&nbsp; Maximum 25 prognostic factors can be used in our model assuming prevalence equal to 17% (as in our data) and assuming that the developed model will explain the 15% of the overall variability (15% is a conservative recommendation by the authors).<br />
+
+&nbsp; The maximum number of baseline factors we aimed to include does not exceed the recommended maximum one and is 8 (including all the categories of the categorical factors): WHO functional class (III vs I or II, IV vs I or II), 6 minutes walk test assessment (numerical), treatment naïve (Yes vs No), Number of months from PAH diagnosis assessment to Start of Treatment (numerical), age (numerical), Biological sex (Female vs Male), Triple therapy (Yes vs No).<br /> 
+&nbsp; We excluded from the analysis patients with missing values in at least one of these baseline factors (in total 8 patients out of 2474 were excluded).
+<br />
+&nbsp; Table 3 presents the mean and the frequency of each candidate baseline prognostic factor in each arm and in the combined dataset (for patients with complete information).<br />
+
+***Table 3. Mean and frequency of the candidate baseline prognostic factors in each arm and in the combined dataset.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+
+table3<-read.csv("C:/Users/KChalkou/OneDrive - JNJ/Desktop/MAP project/Work on IPD PAH/IPD/Report/Codes/Baseline_Factors_Arm.csv")
+deaths<-deaths<-cbind(c(sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==1]), sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==2]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==3]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==4]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==5]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==6]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==7]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==8]),sum(data_needed_complete$EV.EVENT[data_needed_complete$armid==9]),sum(data_needed_complete$EV.EVENT)))
+table3<-cbind(table3,deaths)
+colnames(table3)<-c("Arm", "Age in years (mean)", "6 Minutes Walk Assessment (mean)", "Disease Duration in months (mean)","Men (relative frequency)","Treatment Naive (relative frequency)" , "WHO functional class III (relative frequency)", "WHO functional class IV (relative frequency)", "Number of deaths" )
+kable(table3,caption="Baseline factors in each arm")
+
+```
+<br />
+
+The histograms of each numerical baseline variable are presented in Figure 7.
+
+***Figure 7. Histograms of numerical baseline variables.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+hist(data_needed_complete$AGEN, col = "blue", main ="Age in years", xlab = "Age in Years")
+hist(data$PAH.TD, col = "blue", main="Disease duration in months", xlab="Disease duration in months")
+hist(data_needed_complete$WTSNTDIS, col = "blue", main="6 Minutes walk assessment", xlab="6 Minutes walk assessment")
+
+```
+<br />
+&nbsp; We log-transformed the variable "Disease duration in months" (as log(disease duration +1)), to approximate better the normal distribution and to improve the model's convergence.<br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+hist(data_needed_complete$PAH.TD_log, col = "blue", main ="Disease duration in months (log-transformed)", xlab = "Disease duration in months (log-transformed)")
+
+```
+<br />
+
+#### Adjusting for baseline prognostic factors
+
+&nbsp; We adjusted in a random-effects meta-regression model for all the initial candidate baseline factors (see previous session). The heterogeneity between the arms is now increased to **tau=0.29** from tau=0.12 that it was before the adjustment.<br />
+&nbsp; The meta-regression results along with the MAP prediction are presented in Figure 8.<br /> __Note__: In the meta-regression model, we centralized the numerical variables to the mean.  The presented results are only for studies that: 1) the patients' mean age is 48.5, 2) their mean 6 Minutes walk assessment is 355.4, 3) their mean disease duration is 26.7 months, 4) the included patients are all in WHO functional class categories I or II, and all of them are Males, treatment naive and not in the triple therapy.  <br />
+
+***Figure 8. Meta-regression and MAP results, using all the arms, adjusting for all the initial candidate baseline factors. The results shown are from the random-effects meta-regression model*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_factors_Scenario1_plot
+```
+<br />
+
+&nbsp; The estimated coefficients for each baseline factor are presented in Table 4.<br />
+
+***Table 4. Estimated regression coefficients for each of the candidate baseline prognostic factors.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+Factor<-cbind(c("Age in years", "6 Minutes walk Assessement", "Disease duration in months (log transformed)", "Biological Sex (Male vs Female)", "Treatment Naive (Yes vs No)", "WHO functional class (III vs I or II)", "WHO functional class (IV vs I or II)", "Triple Therapy (Yes vs No)"))
+coefficients<-cbind(c(paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B6,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[6,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[6,7],3),")" ),paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B3,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[3,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[3,7],3),")*" ),paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B5,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[5,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[5,7],3),")" ),paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B7,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[7,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[7,7],3),")*" ), paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B4,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[4,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[4,7],3),")" ), paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B1,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[1,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[1,7],3),")*" ),paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B2,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[2,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[2,7],3),")*" ), paste(round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$mean$B8,3), "(", round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[8,3],3),round(IPDJAGSresults_per_arm_factors_Scenario1$BUGSoutput$summary[8,7],3),")*" ) ))
+
+table4<-as.data.frame(cbind(Factor, coefficients))
+colnames(table4)<-c("Baseline factor", "Regression coefficient (95% CrI)")
+kable(table4,caption="Regression coefficients of each baseline factor")
+
+```
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+#### Adjusting for statistical significant baseline prognostic factors
+
+&nbsp; In order to develop a meta-regression model which includes only the important information, we finalized our analysis keeping in the meta-regression model only the statistical significant baseline factors which influence the all-cause mortality hazard rates (see table 4): WHO functional class (III vs I or II, IV vs I or II), 6 minutes walk test assessment (numerical), Bilogical sex (Male vs Female), and the triple therapy (Yes vs No).<br />
+
+&nbsp; The heterogeneity between the arms was now **tau=0.21** from tau=0.12. The meta-regression results along with the MAP prediction are presented in Figure 9.<br /> __Note__: In the meta-regression model, we centralized the numerical variables to the mean.  The presented results are only for studies that: the patients' mean 6 Minutes walk assessment is 355.4, all of them are in WHO functional class categories I or II, and all of them are Males. <br />
+
+***Figure 9. Meta-regression and MAP results, using all the arms, adjusting for the statistical significant baseline factors. The results shown are from the random-effects meta-regression model*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+# Dataset needed for the forest plost when adjusting for the significant ones prognostic factors
+df_arm_significant_factors_Scenario1<- data.frame(arm=c('MAP','Mean','Bosentan, Sildenafil', 'Macitentan 10', 'Macitentan 3','Placebo, Macitentan, Tadalafil', 'Placebo, Sildenafil','PlaceboG','PlaceboS','Selexipag','Selexipag, Macitentan, Tadalafil'),
+                                        index=1:11,
+                                        Hazard=c(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$log_haz_pred),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$m),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$u)),
+                                        lower=c(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[7,3]),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[9,3]),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[11:19,3])),
+                                        upper=c(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[7,7]),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[9,7]),exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[11:19,7])))
+#create forest plot
+
+per_arm_significant_factors_plot_Scenario1_MAP<-ggplot(data=df_arm_significant_factors_Scenario1, aes(y=index, x=Hazard, xmin=lower, xmax=upper)) +
+  geom_point(size=3,color=c("#000066","#000066","black","black", "black","black","black","black", "black","black","black")) + 
+  geom_errorbarh(linetype=c("solid","solid","dashed","dashed","dashed","dashed","dashed","dashed","dashed","dashed","dashed"),size=0.6,height=.2, color=c("#000066","#000066","black","black", "black","black","black","black", "black","black","black")) +
+  scale_y_continuous(breaks=1:nrow(df_arm_significant_factors_Scenario1), labels=df_arm_significant_factors_Scenario1$arm) +
+  labs(title='Hazards by arm, adjusted for statistical significant prognostic factors', size=7, x='Hazards (yearly)', y = 'Arm') + xlim(0,0.12)+
+  theme(
+    panel.background = element_rect(fill = "white"),
+    plot.background = element_rect(
+      fill = "grey90",
+      colour = "black",
+      size = 1
+    )
+  )+
+  geom_rect(aes(ymin = 0.5, ymax = 2.5, xmin=-Inf, xmax=Inf), fill = "light blue", alpha=0.05)+
+ annotate("text", x = 0.1, y = 11, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==9)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==9),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 10, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==8)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==8),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 9,  label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==7)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==7),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 8, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==6)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==6),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 7, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==5)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==5),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 6, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==4)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==4),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 5, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==3)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==3),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 4, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==2)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==2),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 3, label = paste(sum(data_needed_complete$EV.EVENT[which(data_needed_complete$armid==1)])," events /",nrow(data_needed_complete[which(data_needed_complete$armid==1),]),"patients"))+ 
+  annotate("text", x = 0.1, y = 2, label = paste(round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$m),3), " (",round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[9,3]),3), ",", round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[9,7]),3),")"))+
+  annotate("text", x = 0.11, y = 1, label = paste(round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$log_haz_pred),3), " (",round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[7,3]),3), ",", round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[7,7]),3),")"))+
+  annotate("text", x = 0.0125, y = 1.5, label = paste("tau=",round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$tau,3)))
+
+  per_arm_significant_factors_plot_Scenario1_MAP + theme(plot.title = element_text(size=10))
+
+
+```
+<br />
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+
+&nbsp; The estimated coefficients for each baseline factor are presented in Table 5.<br />
+
+***Table 5. Estimated regression coefficients for each of the finally included baseline prognostic factors.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+
+Factor<-cbind(c("6 Minutes walk Assessement", "Biological Sex (Male vs Female)", "WHO functional class (III vs I or II)", "WHO functional class (IV vs I or II)", "Triple Therapy (Yes vs No)"))
+
+coefficients<-cbind(c(paste(round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$B3,3), "(", round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[3,3],3),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[3,7],3),")*" ),paste(round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$B4,3), "(", round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[4,3],3),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[4,7],3),")*" ),paste(round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$B1,3), "(", round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[1,3],3),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[1,7],3),")*" ),paste(round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$B2,3), "(", round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[2,3],3),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[2,7],3),")*" ), paste(round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$mean$B5,3), "(", round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[5,3],3),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[5,7],3),")*" ) ) )
+
+table5<-as.data.frame(cbind(Factor, coefficients))
+colnames(table5)<-c("Baseline factor", "Regression coefficient (95% CrI)")
+kable(table5,caption="Regression coefficients of the finally included baseline factors")
+
+```
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+#### Final MAP results
+&nbsp; In the previous stage, the coefficients for each baseline factor, the combined mean of all-cause mortality hazard rates across the arms, and the heterogeneity across arms (tau) were estimated. MAP can be used as a prior to any new trial, with the needed baseline characteristics known (in a summary level). For example, UNISUS trial was designed to include similar patients as in a subgroup of SERAPHIN trial patients with 50<="6 Minutes Walk Assessment"<=440. The mean and frequency of this subgroup's needed baseline factors are shown in Table 6.<br />
+
+***Table 6. Mean and frequency of the needed baseline prognostic factors in UNISUS trial (estimated from a subgroup of SERAPHIN trial).***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+STUDY<-c("UNISUS")
+Six_Min<-round(mean(UNISUS_POPULATION$WTSNTDIS),2)
+Sex<-round(table(UNISUS_POPULATION$SEX.C_binary)[2]/(table(UNISUS_POPULATION$SEX.C_binary)[1]+table(UNISUS_POPULATION$SEX.C_binary)[2]),2)
+WHO3<-round(table(UNISUS_POPULATION$WHO.CL3)[2]/(table(UNISUS_POPULATION$WHO.CL3)[1]+table(UNISUS_POPULATION$WHO.CL3)[2]),2)
+WHO4<-round(table(UNISUS_POPULATION$WHO.CL4)[2]/(table(UNISUS_POPULATION$WHO.CL4)[1]+table(UNISUS_POPULATION$WHO.CL4)[2]),2)
+
+table6<-as.data.frame(cbind(STUDY, Six_Min, Sex, WHO3, WHO4))
+colnames(table6)<-c("Study", "6 Minutes Walk Assessment (mean)", "Gender Male (relative frequency)", "WHO functional class III (relative frequency)", "WHO functional class IV (relative frequency)")
+
+
+kable(table6,caption="Baseline factors in UNISUS trial")
+
+```
+<br />
+&nbsp; We then plugged-in to the MAP this information with the corresponding estimated regression coefficients to derive the MAP for a UNISUS-like population.
+
+&nbsp; The prediction for UNISUS trial is presented in Figure 10. **The mean yearly hazard rates in macitentan 10 mg arm in UNISUS trial is estimated to be equal to 0.075, with 95% Credible Interval (CrI) (0.042,0.125).** <br /> The final results are presented in Figure 10.
+
+***Figure 10. Meta-regression and MAP final results for UNISUS trial, adjusting for the statistical significant baseline factors. The results shown are from the random-effects meta-regression model*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+# Dataset needed for the forest plost when adjusting for the significant ones prognostic factors
+per_arm_significant_factors_plot_Scenario1 + theme(plot.title = element_text(size=10))
+
+
+
+```
+
+##### Operating charactiristic 
+&nbsp; The 0.05 significance level power in the UNISUS trial, without the use of MAP is estimated to be equal to 65% (using power t-test), whereas the 0.025 significance level power is 53%,  and the number of all-cause death was assumed 130.<br />
+&nbsp; The parametric approximation of MAP with mixture components of Final MAP in Scenario 1, along with a diagnostic plot for parametric approximation of the MCMC represented MAP prior, are presented in Appendix Section 2. **The ENE of the final model is equal to 27**, and the estimated **0.05 one-sided level power is 72%**,whereas the estimated **0.025 one-sided level power is 60%**. The plot, which represents the power for the total effective sample size (130+27=157) across different hazard-rate levels is presented in Appendix Section 3.<br /> 
+&nbsp; **After robustification**, the ENE was 24 and 21 for weights 10% and 20% respectively. The 0.05 one-sided level power is 71% (for both weights), and the 0.025 one-sided level power is 60% (when weight w=10%), and 59% (when weight w=20%).
+
+
+### Scenario 2
+
+&nbsp;  In scenario 2, we included the studies with patients under an ERA treatment only. Hence, we included in the meta-analysis the patients from Macitentan 3 mg and Macitentan 10 mg arms from SERAPHIN study. In SERAPHIN study, the patients under any background therapy continued their therapy on the top of the Macitentan during the trial. Hence, we included only the treatment naive patients to ensure that the included patients take only an ERA treatment. Some important characteristics (i.e., the baseline statistical significant baseline factors from Scenario 1, and the number of patients and events) of these patients are presented in Table 7. <br />
+
+***Table 7. Important baseline factors and number of patients and deaths in Macitentan 3 mg and Macitentan 10 mg arms in SERAPHIN treatment naive patients.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+
+STUDY<-(cbind(c("SERAPHIN: Macitentan 3 mg (n=88)", "SERAPHIN: Macitentan 10 mg (n=91)")))
+
+Six_Min<-round((cbind(c(mean(dataIPD_Scenario2$WTSNTDIS[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"]),mean(dataIPD_Scenario2$WTSNTDIS[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])))),2)
+
+Sex<-round((cbind(c(table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]/(table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[1]+table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]),table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2]/(table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[1]+table(dataIPD_Scenario2$SEX.C_binary[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2])))),2)
+
+WHO3<-round((cbind(c(table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]/(table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[1]+table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]),table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2]/(table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[1]+table(dataIPD_Scenario2$WHO.CL3[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2])))),2)
+
+WHO4<-round((cbind(c(table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]/(table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[1]+table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"])[2]),table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2]/(table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[1]+table(dataIPD_Scenario2$WHO.CL4[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])[2])))),2)
+
+deaths<-cbind(c(sum(dataIPD_Scenario2$EV.EVENT[dataIPD_Scenario2$group=="SERAPHIN_Macitentan3"]), sum(dataIPD_Scenario2$EV.EVENT[dataIPD_Scenario2$group=="SERAPHIN_Macitentan10"])))
+
+table7<-as.data.frame(cbind(STUDY, deaths, Six_Min, Sex, WHO3, WHO4))
+colnames(table7)<-c("Arm", "Number of deaths", "6 Minutes Walk Assessment", "Gender Male (relative frequency)", "WHO functional class III (realtive frequency)", "WHO functional class IV (realtive frequency)")
+
+kable(table7, row.names = FALSE)
+
+```
+
+<br />
+
+&nbsp;  On the top of the patient-level data we combined summary-level information from  published studies, which include only ERA treatment patients. Specifically, we used the Ambrisentan 10 mg arm from the AMBITION study (Table 2) and all three arms: Ambrisentan 2.5 mg, Ambrisentan 5 mg, and Ambrisentan 10 mg from the ARIES-E study (Table 2). Table 8 presents some important information (i.e., the baseline statistical significant baseline factors from Scenario 1, and the number of patients and events) for these arms. <br />
+
+
+***Table 8. Important baseline factors and number of patients and deaths from the published studies that include patients under an ERA treatment.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+
+STUDY<-(cbind(c("Ambrisentan 10 mg (n=152) (AMBITION  study)", "Ambrisentan 2.5 mg (n=96) (ARIES-E study)", "Ambrisentan 5 mg (n=190) (ARIES-E study)", "Ambrisentan 10 mg (n=97) (ARIES-E study)")))
+
+Six_Min<-c(354.2,350,348,342)
+
+Sex<-c("23%","28%","19%","19%")
+
+WHO3<-c("70%","41%","48%","50%")
+WHO4<-c("0%","5%","8%","10%")
+
+deaths<-c("19", "13", "21", "8")
+
+table8<-as.data.frame(cbind(STUDY, deaths, Six_Min, Sex, WHO3, WHO4))
+colnames(table8)<-c("Arm", "Number of deaths","6 Minutes Walk Assessment", "Gender Male (relative frequency)", "WHO functional class III (realtive frequency)", "WHO functional class IV (realtive frequency)")
+
+kable(table8, row.names = FALSE)
+
+```
+<br />
+
+&nbsp;  Figure 11 presents the meta-analysis results by combining the aforementioned studies (Table 7 & Table 8).The heterogeneity between the arms is equal to **tau=0.19**.<br />
+
+***Figure 11. Meta-analysis and MAP using all the arms, which include patients under ERA treatments. The results shown are from the random-effects meta-analysis.*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario2
+```
+<br />
+__Note__: For the summary-level data, for AMBITION study, in the Binomial distribution, we used the median follow-up time, as follow-up varied between patients in this study. For ambrisentan and tadalafil monotherapy arms, the median follow-up time was 1.75 and for the combination arm was 1.84. However, for ARIES-E study we used the total follow-up time, as this was pre-defined in the study design (2 years).<br />
+
+#### Baseline prognostic factors
+
+&nbsp; The ten rule of thumb indicates that we can use maximum 3 prognostic factors in our meta-regression model and the Riley et. al. method suggests the use of maximum 1 prognostic factor. Hence, we will not consider all the initial baseline factors but only those that were estimated as statistical significant in Scenario 1: Sex, 6 Minutes Walk distance, and WHO functional class.
+
+#### Adjusting for baseline prognostic factors
+
+&nbsp; Figure 13 presents the results from the random-effects meta-analysis, using the mentioned prognostic factors and the MAP prediction for a future study which includes Male patients under an ERA treatment, with WHO funtional class I or II and 6 Minutes Walk distance equal to 350 meters. The heterogeneity across arms is now again estimated **tau=0.19**.
+
+***Figure 13. Meta-analysis and MAP using all the arms, which include patients under ERA treatments, adjusting for prognostic factors identified as statistical significant in Scenario 1. The results shown are from the random-effects meta-analysis. The MAP results and the mean are for patients under the reference categories (Males, WHO functional class I or II and 6 Minutes Walk distance equal to 350 m). *** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario2_adjusting_factors
+```
+
+&nbsp; Table 9 presents the estimated coefficients for each included baseline factor.
+
+
+***Table 9. Estimated regression coefficients for each of the included baseline prognostic factors.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+Factor<-cbind(c("6 Minutes walk Assessement", "Biological Sex (Male vs Female)", "WHO functional class (III vs I or II)", "WHO functional class (IV vs I or II)"))
+coefficients<-cbind(c(paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$mean$B2,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[1,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[1,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$mean$B3,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[2,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[2,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$mean$B4,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[3,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[3,7],3),")" ),paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$mean$B5,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[4,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_factors$BUGSoutput$summary[4,7],3),")")))
+
+table9<-as.data.frame(cbind(Factor, coefficients))
+colnames(table9)<-c("Baseline factor", "Regression coefficient (95% CrI)")
+kable(table9,caption="Regression coefficients of each baseline factor")
+
+```
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+#### Adjusting for statistical significant baseline prognostic factors 
+
+&nbsp; As we are limited in the number of baseline factors we can use, we finalize our analysis by adjusting only for the statistical significant baseline factors in this scenario: **6 Minutes Walk Distance** and **biological sex** (based on Table 9). The results of the meta-analysis along with the MAP prediction are presented in Figure 14. The presented results are for Male patients under an ERA treatment with a 6 Minutes Walk Distance equal to 350. The heterogeneity is equal to **tau=0.2**. <br />
+
+***Figure 14. Meta-analysis and MAP using all the arms, which include patients under ERA treatments, adjusting for statistical significant baseline factors. The results shown are from the random-effects meta-analysis. The MAP results and the mean are for patients under the reference categories (Males, and 6 Minutes Walk distance equal to 350 m). *** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario2_adjusting_significant_factors
+```
+<br />
+
+&nbsp;  Table 10 presents the estimated coefficients for the included statistical significant baseline factors.
+
+
+***Table 10. Estimated regression coefficients for ethe included statistical significant baseline factors.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+Factor<-cbind(c("6 Minutes walk Assessement", "Biological Sex (Male vs Female)"))
+coefficients<-cbind(c(paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$mean$B2,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[1,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[1,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$mean$B3,3), "(", round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[2,3],3),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[2,7],3),")*" )))
+
+table10<-as.data.frame(cbind(Factor, coefficients))
+colnames(table10)<-c("Baseline factor", "Regression coefficient (95% CrI)")
+kable(table10,caption="Regression coefficients of statistical significant baseline factors")
+
+```
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+#### Final MAP results
+
+&nbsp; Here, as in Scenario 1, we used the subgroup of SERAPHIN study to estimate the mean baseline needed factors (Table 6). We used these baseline factors to estimate the MAP for the UNISUS study.
+
+&nbsp; The prediction for UNISUS trial is presented in Figure 10. The mean yearly hazard rates in macitentan 10 mg arm in UNISUS trial is estimated to be equal to 0.071, with 95% Credible Interval (CrI) (0.037,0.13).
+The final results are presented in Figure 15.
+
+***Figure 15. Meta-regression and MAP final results for UNISUS trial, adjusting for the statistical significant baseline factors. The results shown are from the random-effects meta-regression model *** <br />
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario2_adjusting_significant_factors_UNISUS
+```
+
+##### Operating charactiristic 
+
+&nbsp; The parametric approximation of MAP with mixture components of Final MAP in Scenario 1, along with a diagnostic plot for parametric approximation of the MCMC represented MAP prior, are presented in Appendix Section 2. **The ENE of the final model is equal to 15**, and the estimated **0.05 one-sided level power is 69%**,whereas the estimated **0.025 one-sided level power is 57%**. The plot, which represents the power for the total effective sample size (130+15=145) across different hazard-rate levels is presented in Appendix Section 3. <br />
+&nbsp; **After robustification**, the ENE was 13 and 12 for weights 10% and 20% respectively. The 0.05 one-sided level power is 68% (for both weights), and the 0.025 one-sided level power is 57% (when weight w=10%), and 56% (when weight w=20%).
+
+
+### Scenario 3
+
+&nbsp;  In scenario 3, we included all studies with patient-level data, presented in Table 1. The important baseline characteristics and the number of patients and deaths in each arm were presented before in Table 3. 
+<br />
+
+&nbsp;  On the top of the **patient level data** we combined the available **summary-level published information**, which was presented in Table 2. Specifically, we will use the Ambrisentan 10 mg, Tadalafil 40 mg, and combination of Ambrisentan 10 mg & Tadalafil 40 mg arms from the AMBITION study (Table 2) and all three arms: Ambrisentan 2.5 mg, Ambrisentan 5 mg, and Ambrisentan 10 mg from the ARIES-E study (Table 2). Table 11 presents some important information (i.e., the baseline statistical significant baseline factors from Scenario 1, and the number of patients and events) for these arms. <br />
+
+
+***Table 11. Important baseline factors and number of patients and deaths from the available published studies.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+
+STUDY<-(cbind(c("Ambrisentan 10 mg (n=152) (AMBITION  study)","Tadalafil 40 mg (n=151) (AMBITION  study)","Ambrisentan  & Tadalafil (n=302) (AMBITION  study)", "Ambrisentan 2.5 mg (n=96) (ARIES-E study)", "Ambrisentan 5 mg (n=190) (ARIES-E  study)", "Ambrisentan 10 mg (n=97) (ARIES-E  study)")))
+
+Six_Min<-c(366,352, 356,350,348,342)
+
+Sex<-c("23%","20%","26%","28%","19%","19%")
+
+WHO3<-c("70%","65%","69%","41%","48%","50%")
+WHO4<-c("0%","0%","0%","5%","8%","10%")
+
+deaths<-c("19","22","29", "13", "21", "8")
+
+table11<-as.data.frame(cbind(STUDY, deaths, Six_Min, Sex, WHO3, WHO4))
+colnames(table11)<-c("Arm", "Number of deaths","6 Minutes Walk Assessment", "Gender Male (relative frequency)", "WHO functional class III (realtive frequency)", "WHO functional class IV (realtive frequency)")
+
+kable(table11, row.names = FALSE)
+
+```
+<br />
+
+&nbsp; Figure 16 presents the meta-analysis results by combining the aforementioned studies.The heterogeneity between the arms is equal to **tau=0.22**.<br />
+
+***Figure 16. Meta-analysis and MAP using all the arms, which include patients under ERA treatments. The results shown are from the random-effects meta-analysis.*** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario3
+```
+<br />
+__Note__: For the summary-level data, for AMBITION study, in the Binomial distribution, we used the median follow-up time, as follow-up varied between patients in this study. For ambrisentan and tadalafil monotherapy arms, the median follow-up time was 1.75 and for the combination arm was 1.84. However, for ARIES-E study we used the total follow-up time, as this was pre-defined in the study design (2 years).<br />
+
+#### Baseline prognostic factors
+
+&nbsp; We adjusted for the same baseline factors identified as statistical significan in Scenario 1 (Table 4), as here we had the same patient-level data as in scenario 1, from which the within studies regression coefficients can be identified. These baseline factors are:
+1. Triple therapy in TRITON study
+2. 6 minutes walk assessment
+3. WHO funtion class (III vs I or II, IV vs I or II)
+4. Gender (Male vs Female)<br />
+
+
+
+#### Adjusting for baseline prognostic factors
+
+&nbsp; Figure 18 presents the results from the random-effects meta-analysis, using the mentioned prognostic factors and the MAP prediction for a future study which includes Male patients, with WHO functional class I or II and 6 Minutes Walk distance equal to 350 meters. The heterogeneity across arms is now estimated **tau=0.16**.
+
+***Figure 18. Meta-analysis and MAP using all the arms,, adjusting for prognostic factors identified as statistical significant in Scenario 1. The results shown are from the random-effects meta-analysis. The MAP results and the mean are for patients under the reference categories (Males, WHO functional class I or II and 6 Minutes Walk distance equal to 350 m). *** <br />
+
+
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario3_adjusting_factors
+```
+
+&nbsp; Table 12 presents the estimated coefficients for each included baseline factor.
+
+
+***Table 12. Estimated regression coefficients for each of the included baseline prognostic factors.***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+Factor<-cbind(c("6 Minutes walk Assessement", "Biological Sex (Male vs Female)", "WHO functional class (III vs I or II)", "WHO functional class (IV vs I or II)", "Triple TRITON therapy (Yes vs No"))
+coefficients<-cbind(c(paste(round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$mean$B3,3), "(", round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[2,3],3),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[2,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$mean$B4,3), "(", round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[3,3],3),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[3,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$mean$B5,3), "(", round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[4,3],3),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[4,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$mean$B6,3), "(", round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[5,3],3),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[5,7],3),")*" ),paste(round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$mean$B2,3), "(", round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[1,3],3),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[1,7],3),")" )))
+
+table12<-as.data.frame(cbind(Factor, coefficients))
+colnames(table12)<-c("Baseline factor", "Regression coefficient (95% CrI)")
+kable(table12,caption="Regression coefficients of each baseline factor")
+
+```
+"*" denotes the CrIs that do not include the 0 value and hence are statistical significant
+<br />
+
+#### Final MAP results
+
+&nbsp; Here, as in previous scenarios, we used the subgroup of SERAPHIN study to estimate the mean baseline needed factors (Table 6). We used these baseline factors to estimate the MAP for the UNISUS study.
+
+&nbsp; The prediction for UNISUS trial is presented in Figure 10. The mean yearly hazard rates in macitentan 10 mg arm in UNISUS trial is estimated to be equal to 0.074, with 95% Credible Interval (CrI) (0.049,0.109).
+The final results are presented in Figure 19.
+
+***Figure 19. Meta-regression and MAP final results for UNISUS trial, adjusting for the statistical significant baseline factors. The results shown are from the random-effects meta-regression model *** <br />
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario3_adjusting_factors_UNISUS
+```
+<br />
+
+##### Heterogeneity assessment
+
+&nbsp; The heterogeneity statistic I<sup>2</sup> was estimated using frequentist meta-analysis of log hazard rates in scenario 3 (adjusted for triple therapy only). The heterogeneity statistic I<sup>2</sup> is equal to 49.6%, which can be interpreted as moderate heterogeneity between arms.<br />
+
+&nbsp; In Figure 20 we present the hazard rates and their 95% credible intervals per arm, assuming independent hazard rates per arm (there is not information borrowing between arms). As presented, the credible intervals overlap between arms, which indicates that there is not considerable heterogeneity across arms.<br />
+
+
+***Figure 20. Hazard rates, and their credible intervals per arm, assuming them independent*** <br />
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario3_independent
+```
+<br />
+
+
+&nbsp; Finally, in Figure 21 we compare the random-effects meta-analysis results with the fixed-effects results (assumed heterogeneity between arms 0). As both estimates are very close we can conclude that the heteregoneity between arms is not considerable.
+
+<br />
+***Figure 21. Meta-analysis results using fixed-effects and random-effects models*** <br />
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=10}
+per_arm_plot_Scenario3_adjusting_factors_UNISUS_fixed
+```
+<br />
+
+
+##### Operating charactiristic 
+
+&nbsp; The parametric approximation of MAP with mixture components of Final MAP in Scenario 1, along with a diagnostic plot for parametric approximation of the MCMC represented MAP prior, are presented in Appendix Section 2. **The ENE of the final model is equal to 49**, and the estimated **0.05 one-sided level power is 77%**, whereas the estimated **0.025 one-sided level power is 66%**. The plot, which represents the power for the total effective sample size (130+49=179) across different hazard-rate levels is presented in Appendix Section 3. <br />
+&nbsp; **After robustification**, the ENE was 44 and 39 for weights 10% and 20% respectively. The 0.05 one-sided level power is 76% (when weight w=10%) and 75% (when weight w=20%), and the 0.025 one-sided level power is 65% (when weight w=10%), and 64% (when weight w=20%).
+
+### Comparison of results
+
+&nbsp; In Table 13 the MAP results of several models are presented, along with the heterogeneity (tau), the ENE, the 5% significance level power, and the 2.5% significance level power. Using different scenarios, and models the MAP result to similar numerical values: 0.071 to 0.079 all-cause mortality hazard rates (yearly).  
+
+&nbsp; In addition, in  UNISUS trial, the 5% significance level power in the UNISUS trial, without the use of MAP is estimated to be equal to 65% (using power t-test), whereas the 2.5% significance level power is 53%. Using MAP information increases the power regardless of which model will be used. Scenario 3, which uses all the relevant information, leads to the highest power (77% for 5% significance-level) compared to the other models.
+
+
+
+***Table 13. Estimated MAP, between arms heterogeneity (tau), prior effective sample size (ENE), and power for different models***  <br />
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+Scenario<-cbind(c("Scenario 1 without adjustments", "Scenario 1 adjusted for triple therapy", "Scenario 1 adjusted for significant factors", "Scenario 2 adjusted for significant factors", "Scenario 3 adjusted for significant factors"))
+MAP<-cbind(c(paste(round(exp(IPDJAGSresults_per_arm$BUGSoutput$summary[2,1]),3), "(", round(exp(IPDJAGSresults_per_arm$BUGSoutput$summary[2,3]),3),round(exp(IPDJAGSresults_per_arm$BUGSoutput$summary[2,7]),3),")" ),paste(round(exp(IPDJAGSresults_per_arm_Scenario1$BUGSoutput$summary[3,1]),3), "(", round(exp(IPDJAGSresults_per_arm_Scenario1$BUGSoutput$summary[3,3]),3),round(exp(IPDJAGSresults_per_arm_Scenario1$BUGSoutput$summary[3,7]),3),")" ),paste(round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[8,1]),3), "(", round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[8,3]),3),round(exp(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[8,7]),3),")" ),paste(round(exp(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[4,1]),3), "(", round(exp(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[4,3]),3),round(exp(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[4,7]),3),")" ),paste(round(exp(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[7,1]),3), "(", round(exp(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[7,3]),3),round(exp(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[7,7]),3),")" )))
+
+tau<-cbind(c(round(IPDJAGSresults_per_arm$BUGSoutput$summary[4,1],2),round(IPDJAGSresults_per_arm_Scenario1$BUGSoutput$summary[5,1],2),round(IPDJAGSresults_per_arm_significant_factors_Scenario1$BUGSoutput$summary[10,1],2),round(IPDADJAGSresults_per_arm_Scenario2_adjusting_significant_factors$BUGSoutput$summary[6,1],2),round(IPDADJAGSresults_per_arm_Scenario3_adjusting_factors$BUGSoutput$summary[9,1],2)))
+
+ENE<-cbind(c(round(MAP.ess1a),round(MAP.ess1b),round(MAP.ess1),round(MAP.ess2),round(MAP.ess3)))
+
+power<-cbind(c(round(power_MAP1a,3),round(power_MAP1b,3),round(power_MAP1,3),round(power_MAP2,3),round(power_MAP3,3)))
+
+power_025<-cbind(c(round(power_MAP1a_025,3),round(power_MAP1b_025,3),round(power_MAP1c_025,3),round(power_MAP2_025,3),round(power_MAP3_025,3)))
+
+table13<-as.data.frame(cbind(MAP, tau,ENE,power,power_025))
+
+colnames(table13)<-c("MAP (95% CrI)", "tau", "ENE", "power (5% significance level","power (2.5% significance level")
+
+rownames(table13)<-c("Scenario 1 without adjustments", "Scenario 1 adjusted for triple therapy", "Scenario 1 adjusted for significant factors", "Scenario 2 adjusted for significant factors", "Scenario 3 adjusted for significant factors")
+
+kable(table13)
+
+```
+
+
+
+&nbsp; 
+
+
+## References <br />
+
+<font size="+1"> 
+
+1. Roychoudhury S, Neuenschwander B. **Bayesian leveraging of historical control data for a clinical trial with time-to-event endpoint**. Stat Med. 2020 Mar 30;39(7):984-995. doi: 10.1002/sim.8456.
+
+2. Schmidli H, Gsteiger S, Roychoudhury S, Spiegelhalter AD, Neuenschwander B. **Robust meta-analytic-predictive priors in clinical trials with historical control information**. Biometrics. 2014 Dec;70(4):1023-32. doi: 10.1111/biom.12242. 
+
+3. Neuenschwander B, Capkun-Niggli G, Branson M, Spiegelhalter DJ. **Summarizing historical information on controls in clinical trials**. Clin Trials. 2010 Feb;7(1):5-18. doi: 10.1177/1740774509356002.
+
+4. Borenstein M, Hedges LV, Higgins JPT, Rothstein HR. **A basic introduction to fixed-effect and random-effects models for meta-analysis**. Res Synth Methods. 2010 Apr;1(2):97-111. doi: 10.1002/jrsm.12. 
+
+5. Nagashima K, Noma H, Furukawa TA. **Prediction intervals for random-effects meta-analysis: A confidence distribution approach**. Stat Methods Med Res. 2019 Jun;28(6):1689-1702. doi: 10.1177/0962280218773520
+
+6. Galiè N, Barberà JA, Frost AE, et. al. **Initial Use of Ambrisentan plus Tadalafil in Pulmonary Arterial Hypertension**. N Engl J Med. 2015 Aug 27;373(9):834-44. doi: 10.1056/NEJMoa1413687.
+
+7. Hoeper MM, McLaughlin VV, Barberá JA, et. al. **Initial combination therapy with ambrisentan and tadalafil and mortality in patients with pulmonary arterial hypertension: a secondary analysis of the results from the randomised, controlled AMBITION study**. Lancet Respir Med. 2016 Nov;4(11):894-9017.
+
+8. Oudiz RJ, Galiè N, Olschewski H, et.al. **Long-term ambrisentan therapy for the treatment of pulmonary arterial hypertension**. J Am Coll Cardiol. 2009 Nov 17;54(21):1971-81.
+
+9. Steyerberg EW, Schemper M, Harrell F. **Logistic regression modeling and the number of events per variable: selection bias dominates.** J Clin Epidemiol 2011;64:1464e5. 
+
+10. Riley RD, Snell KI, Ensor J, Burke DL, Harrell FR, Moons KG, Collins GS. **Minimum sample size for developing a multivariable prediction model: PART II - binary and time-to-event outcomes.** Stat Med. 2019 Mar 30;38(7):1276-1296. doi: 10.1002/sim.7992.
+
+11. Weber S, Li Y, Seaman JW, Kakizume T, Schmidli H. **Applying Meta-Analytic-Predictive Priors with the R Bayesian Evidence Synthesis Tools.** Journal of Statistical Software. 2021 Nov;100(19). doi: 10.18637/jss.v100.i19
+
+12. Saramago P, Chuang LH, O Soares M. **Network meta-analysis of (individual patient) time to event data alongside (aggregate) count data.** BMC Med Res Methodol. 2014;14:105. doi: 10.1186/1471-2288-14-105 <br />
+
+13. Woods BS, Hawkins N, Scott D. Network meta-analysis on the log-hazard rates scale, combining count and hazard ratio statistics accounting for multi-arm trials: A tutorial. 2010. BMC Medical Research Methodology.
+
+14. Neuenschwander B, Weber S, Schmidli H, O'Hagan A. Predictively consistent prior effective sample sizes. Biometrics. 2020;76(2):578-587
+
+15. R Core Team. **A language and environment for statistical computing.** Vienna, Austria. https://www.R-project.org/: R Foundation for Statistical Computing; 2019.
+
+16. Yu-Sung S, Masanao Y. **R2jags: using R to Run “JAGS”.** https://CRAN.R-project.org/package=R2jags. Published online August 23, 2015.
+
+
+
+
+## Appendix <br />
+
+### Section 1 - Comparison of Exponential, Lognormal and Weibull distributions with Kaplan-Meier survival curves in each arm
+
+***Comparison of Exponential, and Lognormal with Kaplan-Meier survival curves in each arm.*** <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+BosSol_Compass2_Survival_curves
+Mac10_Seraphin_Survival_curves
+Mac3_Seraphin_Survival_curves
+PlMacTad_Triton_Survival_curves
+PlSil_Compass2_Survival_curves
+Pl_Griphon_Survival_curves
+Pl_Seraphin_Survival_curves
+Sel_Griphon_Survival_curves
+SelMacTad_Triton_Survival_curves
+```
+<br />
+
+***Comparison of Exponential, and Weibull with Kaplan-Meier survival curves.*** <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+BosSol_Compass2_Survival_curves_EW
+Mac10_Seraphin_Survival_curves_EW
+Mac3_Seraphin_Survival_curves_EW
+PlMacTad_Triton_Survival_curves_EW
+PlSil_Compass2_Survival_curves_EW
+Pl_Griphon_Survival_curves_EW
+Pl_Seraphin_Survival_curves_EW
+Sel_Griphon_Survival_curves_EW
+SelMacTad_Triton_Survival_curves_EW
+```
+
+
+### Section 2 - Parametric approximation of MAP with mixture components 
+
+***Scenario 1 (Final model)***
+
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+a<-prior.ss.int.mix1[1,]
+b<-prior.ss.int.mix1[2,]
+c<-prior.ss.int.mix1[3,]
+
+x<-rbind(a,b,c)
+x<-as.data.frame(x)
+
+rownames(x)<-c("Mixture Component Weight", "Mean", "Standard Deviation")
+colnames(x)<-c("Component 1","Component 2","Component 3")
+
+
+kable(round(x,2),caption="MAP approximation")
+
+```
+
+$$0.56*N(−2.61,〖0.27〗^2 ) + 0.38*N(−2.55,  〖0.11〗^2 )+0.06 * N(−2.68,〖0.67〗^2)$$
+**Diagnostic plot for parametric approximation of the MCMC represented MAP prior**
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot(prior.ss.int.mix1)$mix
+```
+
+
+***Scenario 2 (Final model)***
+
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+a<-prior.ss.int.mix2[1,]
+b<-prior.ss.int.mix2[2,]
+c<-prior.ss.int.mix2[3,]
+
+x<-rbind(a,b,c)
+x<-as.data.frame(x)
+
+rownames(x)<-c("Mixture Component Weight", "Mean", "Standard Deviation")
+colnames(x)<-c("Component 1","Component 2","Component 3")
+
+
+kable(round(x,2),caption="MAP approximation")
+
+```
+
+$$0.59*N(−2.64,〖0.14〗^2) + 0.34*N(−2.66, 〖0.35〗^2)+0.06*N(−2.68,〖0.77〗^2)$$
+
+**Diagnostic plot for parametric approximation of the MCMC represented MAP prior**
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot(prior.ss.int.mix2)$mix
+```
+
+
+***Scenario 3 (Final model)***
+
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+library(knitr)
+a<-prior.ss.int.mix3[1,]
+b<-prior.ss.int.mix3[2,]
+c<-prior.ss.int.mix3[3,]
+
+
+x<-rbind(a,b,c)
+x<-as.data.frame(x)
+
+rownames(x)<-c("Mixture Component Weight", "Mean", "Standard Deviation")
+colnames(x)<-c("Component 1","Component 2","Component 3","Component 4")
+
+
+kable(round(x,2),caption="MAP approximation")
+
+```
+$$0.38*N(−2.57,〖0.08〗^2) + 0.27*N(−2.69,  〖0.13〗^2 )+0.24*N(−2.63, 〖0.30〗^2 )+0.11 N(−2.42,  〖0.13〗^2)$$
+
+**Diagnostic plot for parametric approximation of the MCMC represented MAP prior**
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot(prior.ss.int.mix2)$mix
+```
+
+### Section 3 - Power for the total effective sample size across different hazard-rate levels 
+
+The blue dashed line corresponds to the addition of MAP information and the red line corresponds to the trial's design power without the use of MAP.<br />
+θ<sub>a</sub> represents the true log hazard ratio
+
+***Scenario 1 (Final model)***
+<br />
+**0.05 significance level**<br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP1c
+```
+<br />
+**0.025 significance level** <br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP1c_025
+```
+
+
+***Scenario 2 (Final model)***
+<br />
+
+**0.05 significance level**<br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP2
+```
+<br />
+**0.025 significance level**<br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP2_025
+```
+<br />
+
+***Scenario 3 (Final model)***
+<br />
+**0.05 significance level**<br />
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP3
+```
+<br />
+**0.025 significance level**
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+plot_power_MAP3_025
+```

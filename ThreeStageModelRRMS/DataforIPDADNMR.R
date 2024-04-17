@@ -232,3 +232,27 @@ jagsdataIPDADNMR_model3 <- list(
   meanMonths.since.last.relapse=as.numeric(mean(RiskData$months.since.last.relapse))
 )
 
+
+
+
+jagsdataIPDNMR <- list(
+  Nstudies=3,
+  Np=sum(as.numeric(table(as.numeric(as.factor(RiskData$STUDYID))))),
+  studyid=as.numeric(as.factor(RiskData$STUDYID)),
+  outcome=as.numeric(RiskData$outcome)-1,
+  treat= rbind(c(3,4,NA),c(1,2,4),c(1,4,NA)),
+  treatment=as.numeric(RiskData$TRT01A),
+  na=c(2,3,2),
+  arm=RiskData$arm,
+  outcomeP=PlaceboArms$Relapse2year,
+  NpPlacebo=nrow(RiskData[RiskData$Treatment=="Placebo",]),
+  logitRisknew=logitRisknew1,
+  logitmeanRisknew=-0.5632 ,
+  logitmeanRisknew2=-1.4594,
+  Nnew=99,
+  ref=4,
+  nt=4,
+  Risk=RiskData$logitp4,
+  Risk_placebo=RiskData$logitp4[RiskData$Treatment=="Placebo"],
+  meanRisk=c(tapply(RiskData$logitp4, RiskData$STUDYID, summary)$`1`[4],tapply(RiskData$logitp4, RiskData$STUDYID, summary)$`2`[4],tapply(RiskData$logitp4, RiskData$STUDYID, summary)$`3`[4])##here is the mean of logit of risk in AD
+  )

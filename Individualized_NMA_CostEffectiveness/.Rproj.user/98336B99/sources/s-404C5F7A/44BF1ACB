@@ -1,0 +1,24 @@
+{
+    "id": "44BF1ACB",
+    "path": "~/GitHub/Reproduce-results-from-papers/Individualized_NMA_CostEffectiveness/DataForIPDNMR_Relapse.R",
+    "project_path": "DataForIPDNMR_Relapse.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1699700698173.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "1,16",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1713354040,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1713354040188,
+    "read_only": false,
+    "read_only_alternatives": []
+}

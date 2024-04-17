@@ -1,0 +1,262 @@
+---
+title: "What is the protection afforded by BCG against leprosy in Karonga District,Northern Malawi?"
+author: "Konstantina Chalkou"
+date: "4/26/2023"
+output:
+  word_document:
+    toc: yes
+    toc_depth: '6'
+  html_document:
+    theme: cerulean
+    body_placement: left
+    toc: yes
+    toc_depth: 6
+    toc_collapsed: no
+  pdf_document:
+    toc: yes
+    toc_depth: '6'
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 100% !important;
+  margin-left: 0%;
+  margin-right: 0%;
+  text-align: justify;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  $items = $('div#TOC li');
+  $items.each(function(idx) {
+    num_ul = $(this).parentsUntil('#TOC').length;
+    $(this).css({'text-indent': num_ul * 10, 'padding-left': 0});
+  });
+
+});
+</script>
+
+<style>
+  .superbigimage{
+      overflow: scroll !important;
+      white-space: nowrap;
+      max-width: 1600px;
+      max-height: 700px;
+  }
+
+  img{
+     max-width: 1000%;
+     max-height: 1000%;
+  }
+
+
+</style>
+
+```{css toc-content, echo = FALSE}
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+
+div.tocify {
+  width: 40%;
+  max-width: 450px;
+}
+```
+<div align="justify">
+```{r include= FALSE}
+### load the needed libraries
+library(haven)
+library(ggplot2)
+library(dplyr)
+library(rms)
+library(ggpubr)
+
+#read the dta data
+leprosy_data<-read_dta("C:/Users/kc19o338/Desktop/ctu/Biostatistician Exercise/chilumba.dta")
+```
+
+## Data Description
+
+<font size="+1"> 
+```{r results='asis', echo=FALSE, warning=FALSE, fig.width=12, fig.height=7, fig.align='center'}
+
+######################### Step 1. Exploration of data #######################################
+#a. all variables are categorical - change them to factors
+leprosy_data$sex<-as.factor(leprosy_data$sex)
+leprosy_data$caco<-as.factor(leprosy_data$caco)
+leprosy_data$agegrp<-as.factor(leprosy_data$agegrp)
+leprosy_data$bcgscar<-as.factor(leprosy_data$bcgscar)
+leprosy_data$school<-as.factor(leprosy_data$school)
+leprosy_data$mbcont<-as.factor(leprosy_data$mbcont)
+leprosy_data$pbcont<-as.factor(leprosy_data$pbcont)
+
+#plot for cases per sex - more women in cases
+mytable <- table(leprosy_data$caco, leprosy_data$sex)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "Sex", "Proportion")
+myplot <- ggplot(data = myproptable)
+csex<-myplot + geom_col(aes(x = Case, y = Proportion, fill = Sex), 
+                  position = position_dodge(width = 0.9), 
+                  alpha = 0.8) +
+  labs(title = "Sex and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+#plot for cases per school - more percentage of school category 1 in cases, less in 3 and 4
+mytable <- table(leprosy_data$caco, leprosy_data$school)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "School", "Proportion")
+myplot <- ggplot(data = myproptable)
+cschool<-myplot + geom_col(aes(x = Case, y = Proportion, fill = School), 
+                        position = position_dodge(width = 0.9), 
+                        alpha = 0.8) +
+  labs(title = "School and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per age - more percentage of people >=30 in cases
+mytable <- table(leprosy_data$caco, leprosy_data$agegrp)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "AgeGroup", "Proportion")
+myplot <- ggplot(data = myproptable)
+cage<-myplot + geom_col(aes(x = Case, y = Proportion, fill = AgeGroup), 
+                           position = position_dodge(width = 0.9), 
+                           alpha = 0.8) +
+  labs(title = "Age group and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per BCG scar - less percentage of BCG yes in cases
+mytable <- table(leprosy_data$caco, leprosy_data$bcgscar)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "BCG", "Proportion")
+myplot <- ggplot(data = myproptable)
+cbcg<-myplot + geom_col(aes(x = Case, y = Proportion, fill = BCG), 
+                        position = position_dodge(width = 0.9), 
+                        alpha = 0.8) +
+  labs(title = "BCG scar and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per household contact with multibacillary case  - more percentage of mbcont in cases
+mytable <- table(leprosy_data$caco, leprosy_data$mbcont)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "Mbcont", "Proportion")
+myplot <- ggplot(data = myproptable)
+cmb<-myplot + geom_col(aes(x = Case, y = Proportion, fill = Mbcont), 
+                        position = position_dodge(width = 0.9), 
+                        alpha = 0.8) +
+  labs(title = "Multibacillary contact and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per household contact with paucibacillary case  - more percentage of pbcont in cases
+mytable <- table(leprosy_data$caco, leprosy_data$pbcont)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "pbcont", "Proportion")
+myplot <- ggplot(data = myproptable)
+cpb<-myplot + geom_col(aes(x = Case, y = Proportion, fill = pbcont), 
+                       position = position_dodge(width = 0.9), 
+                       alpha = 0.8) +
+  labs(title = "Paucibacillary contact and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+#Final plot
+data_plot<-ggarrange(csex,cage,cschool,cbcg,cmb,cpb,ncol=3,nrow=3)
+data_plot
+```
+
+```{r results=TRUE, echo=FALSE, warning=FALSE}
+summary(leprosy_data)
+```
+ &nbsp; **School** includes 51/1260 missing values, from which 19 are cases and 32 are non-cases. <br /> </p>
+Options: 
+<br /> </p>
+1) Assuming missingness completely at random (MCAR) and use a complete case analysis 
+<br /> </p>
+2) Assuming missing at random (MAR) and perform multiple imputations techniques  
+<br /> </p>
+
+ &nbsp; **School** includes only 23 individuals in its 4th category.
+ <br /> </p>
+Options: 
+<br /> </p>
+1) We could combine this category with the 3rd one 
+<br /> </p>
+2) We could use this variable as numerical instead of categorical 
+ <br /> </p>
+ 
+&nbsp; **Mbcont** also includes only 21 individuals in “yes” category <br /> </p>
+Options: We could combine mbcont and pbcont into one category “Household contact with multibacillary or paucibacillary case” (lep_contact).  
+However, if we do so, we might lose information. <br /> </p>
+
+## Generation of new age and school variable where each category is assigned a sensible numeric value
+```{r results=TRUE, echo=FALSE, warning=FALSE}
+#create a new school variable - combine category 4 with category 3 in school variable (cell with scarce data)
+leprosy_data$school_comb<-leprosy_data$school
+leprosy_data$school_comb[leprosy_data$school_comb==4]<-3
+leprosy_data$school_comb<-as.factor(leprosy_data$school_comb)
+##create a new variable - combine mbcont and pbcont categories
+leprosy_data$lep_contact<-NA
+leprosy_data$lep_contact[leprosy_data$mbcont==1 | leprosy_data$pbcont==1 ]<-1
+leprosy_data$lep_contact[leprosy_data$mbcont==0 & leprosy_data$pbcont==0 ]<-0
+```
+
+```{r results=TRUE, echo=TRUE, warning=FALSE}
+#change of school variable to a sensible numerical variable
+leprosy_data$school_num[leprosy_data$school==1]<-0
+leprosy_data$school_num[leprosy_data$school==2]<-(1+5)/2
+leprosy_data$school_num[leprosy_data$school==3]<-(6+8)/2
+leprosy_data$school_num[leprosy_data$school==4]<-(9+17)/2
+
+```
+
+&nbsp; For the **school** variable, I selected the midpoint of education years in each category, i.e. 0: None=0, 1: (1+5)/2=3, 2: (6+8)/2=7, 3:(9+17)/2=13 <br /> </p>
+The reason for selecting the midpoint is that it provides a single, representative value of education years that can be used to represent the entire age range. <br /> </p>
+__The problem__ here is that I don’t know the maximum education years of individuals included, which influences the last school group category. I selected the 17 years, keeping in mind that the secondary school lasts for 4 years and the tertiary school lasts for additional 4 years (in total 8) 
+<br /> </p>
+```{r results=TRUE, echo=TRUE, warning=FALSE}
+#change of age variable to a sensible numerical variable
+leprosy_data$age_num[leprosy_data$agegrp==1]<-(5+9)/2
+leprosy_data$age_num[leprosy_data$agegrp==2]<-(10+15)/2
+leprosy_data$age_num[leprosy_data$agegrp==3]<-(15+19)/2
+leprosy_data$age_num[leprosy_data$agegrp==4]<-(20+29)/2
+leprosy_data$age_num[leprosy_data$agegrp==5]<-(30+70)/2
+
+```
+&nbsp; For the **age** variable I selected the midpoint of age years in each category, i.e. 1: (5+9)/2=7, 2: (10+15)/2=12.5, 3: (15+19)/2=17, 4:(20+29)/2=24.5, 5: (30+70)/2=50 <br /> </p>
+The reason for selecting the midpoint is that it provides a single, representative value that can be used to represent the entire age range. <br /> </p>
+__The problem__ here is that I don’t know the maximum age of individuals included, which influences the last age group category. I selected the 70 years old as the oldest person in the dataset, however this choice might induce bias if the oldest individual is much older or much younger than 70
+<br /> </p>
+<br /> </p>
+
+## Crude relationship of BCG and leprosy
+
+&nbsp; I ran a logistic regression model, with leprosy’s case (yes vs no) as dependent variable and BCG as independent variable:
+<br /> </p>
+```{r results=TRUE, echo=FALSE, warning=FALSE}
+dd <- datadist(leprosy_data)
+ options(datadist="dd")
+
+######################### Step 3. crude association of BCG with leprosy ####################
+#run the model
+model<-lrm(caco~bcgscar,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model
+#obtain the 95% confidence intervals
+coef <- coef(model)
+se <- sqrt(diag(vcov(model)))
+z <- qnorm(0.975) # 95% confidence level
+lower <- coef - z*se
+upper <- coef + z*se
+results <- data.frame(coef = coef, lower = lower, upper = upper)
+##results in ORs scale
+exp(results)
+```
+
+**__Interpretation of results__**: The odds of leprosy of an individual vaccinated with BCG is 0.23 times (95% CI: 0.16, 0.32) the odds of an individual that is not vaccinated with BCG, indicating a strong protective effect of BCG vaccination on the risk of developing leprosy.

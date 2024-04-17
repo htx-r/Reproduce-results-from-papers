@@ -1,0 +1,69 @@
+"0","dd <- datadist(leprosy_data)"
+"2","There were 50 or more warnings (use warnings() to see the first 50)"
+"2","
+"
+"0"," options(datadist=""dd"")"
+"0",""
+"0","######################### Step 3. crude association of BCG with leprosy ####################"
+"0","#run the model"
+"0","model<-lrm(caco~bcgscar,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)"
+"0","model"
+"1","Logistic Regression Model
+"
+"1"," "
+"1","
+"
+"1"," "
+"1","lrm(formula = caco ~ bcgscar, data = leprosy_data, x = TRUE, 
+"
+"1"," "
+"1","    y = TRUE, linear.predictors = TRUE)
+"
+"1"," "
+"1","
+"
+"1"," "
+"1","                       Model Likelihood    Discrimination    Rank Discrim.    
+"
+"1"," "
+"1","                             Ratio Test           Indexes          Indexes    
+"
+"1"," "
+"1","Obs          1260    LR chi2      84.35    R2       0.102    C       0.652    
+"
+"1"," "
+"1"," 0           1008    d.f.             1    g        0.721    Dxy     0.304    
+"
+"1"," "
+"1"," 1            252    Pr(> chi2) <0.0001    gr       2.057    gamma   0.632    
+"
+"1"," "
+"1","max |deriv| 2e-13                          gp       0.097    tau-a   0.097    
+"
+"1"," "
+"1","                                           Brier    0.150                     
+"
+"1"," "
+"1","
+"
+"1"," "
+"1","          Coef    S.E.   Wald Z Pr(>|Z|)
+"
+"1"," "
+"1","Intercept -0.9333 0.0815 -11.46 <0.0001 
+"
+"1"," "
+"1","bcgscar=1 -1.4902 0.1804  -8.26 <0.0001 
+"
+"1"," "
+"1","
+"
+"0","#obtain the 95% confidence intervals"
+"0","coef <- coef(model)"
+"0","se <- sqrt(diag(vcov(model)))"
+"0","z <- qnorm(0.975) # 95% confidence level"
+"0","lower <- coef - z*se"
+"0","upper <- coef + z*se"
+"0","results <- data.frame(coef = coef, lower = lower, upper = upper)"
+"0","##results in ORs scale"
+"0","exp(results)"

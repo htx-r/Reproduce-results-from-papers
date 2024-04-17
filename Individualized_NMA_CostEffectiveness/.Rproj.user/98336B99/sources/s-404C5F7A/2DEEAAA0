@@ -1,0 +1,24 @@
+{
+    "id": "2DEEAAA0",
+    "path": "~/GitHub/Reproduce-results-from-papers/Individualized_NMA_CostEffectiveness/R/modelIPDNMR_CDP.fun.R",
+    "project_path": "R/modelIPDNMR_CDP.fun.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1699700178246.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "1,58",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1713354083,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1713354083117,
+    "read_only": false,
+    "read_only_alternatives": []
+}

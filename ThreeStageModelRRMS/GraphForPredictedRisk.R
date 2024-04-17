@@ -41,6 +41,14 @@ colnames(PlL)<-c("Risknew","prelapse","lower","upper","Treatment")
 ##merge data for all the treatments
 GraphdataL<-rbind(DFL,GAL,NL,PlL)
 
+write.xlsx(GraphdataL,"C:/Users/kc19o338/Documents/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/Results/Data for the Graph_IPDAD.xls",row.names = F)
+GraphdataF<-read_excel("C:/Users/kc19o338/Documents/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/Results/Data for the Graph_IPDAD.xls")
+Graphdata1<-GraphdataF[,5]
+Graphdata2<-GraphdataF[,2]
+Graphdata3<-GraphdataF[,1]
+Graphdata<-cbind(Graphdata1,Graphdata2,Graphdata3)
+colnames(Graphdata)<-c("Treatment", "Predicted probability to relapse within the next 2 years %", "Baseline risk score")
+write.csv(Graphdata,"Data for the Graph_IPDAD.csv",row.names = F)
 
 ###Graph for IPD (predicted probabilities)
 

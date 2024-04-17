@@ -1,0 +1,11 @@
+install.packages("synthpop")
+library(synthpop)
+original_data<-MSrelapse[MSrelapse$STUDYID!="MSCRG",]
+todrop<-c("USUBJID")
+original_data <- original_data[,!(names(original_data) %in% todrop)]
+##
+original_data$TRT01A<-droplevels(original_data$TRT01A)
+synthetic_data <- syn(original_data)
+
+dataset<-as.data.frame(synthetic_data$syn)
+write.csv(dataset,"C:/Users/kc19o338/Desktop/MedOptima/dataset.csv")                      

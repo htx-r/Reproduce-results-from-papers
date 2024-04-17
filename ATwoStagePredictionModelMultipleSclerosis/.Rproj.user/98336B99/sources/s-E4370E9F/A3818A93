@@ -1,0 +1,25 @@
+{
+    "id": "A3818A93",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1681826001782.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "id": "690816e52d4e4c5dae81e3b4afecbe58",
+        "name": "synthetic_data",
+        "title": "synthetic_data"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 2322206432585609839,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1681826001782,
+    "read_only": false,
+    "read_only_alternatives": []
+}

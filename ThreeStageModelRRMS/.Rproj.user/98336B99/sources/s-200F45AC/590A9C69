@@ -1,0 +1,24 @@
+{
+    "id": "590A9C69",
+    "path": "~/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/Recalibration.R",
+    "project_path": "Recalibration.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1698003372764.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "20,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1696689966,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1696689966,
+    "read_only": false,
+    "read_only_alternatives": []
+}

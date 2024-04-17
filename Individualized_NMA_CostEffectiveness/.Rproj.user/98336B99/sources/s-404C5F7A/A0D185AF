@@ -1,0 +1,21 @@
+{
+    "id": "A0D185AF",
+    "path": "~/GitHub/Reproduce-results-from-papers/Individualized_NMA_CostEffectiveness/annualized relapse rate per risk.R",
+    "project_path": "annualized relapse rate per risk.R",
+    "type": "r_source",
+    "hash": "1056735124",
+    "contents": "",
+    "dirty": false,
+    "created": 1713354368115.0,
+    "source_on_save": false,
+    "relative_order": 10,
+    "properties": {},
+    "folds": "",
+    "lastKnownWriteTime": 1675774214,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1675774214,
+    "read_only": false,
+    "read_only_alternatives": []
+}

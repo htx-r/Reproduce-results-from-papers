@@ -6,7 +6,7 @@
 
 
 MIDataSMSC.fun=function(datapath){
-  datasetpath=paste(datapath,"/SMSC_phase1_cycles.xlsx",sep="")
+  datasetpath=paste(datapath,"/SMSC_corrected2.xlsx",sep="")
   dataset<- read_excel(datasetpath)
 
   todrop<-c("visit.date","visit.type","disease.course","edss.date","excluded.during.manual.review","nr.relapses.2y.after.study", "birth.date","ethnic.origin",

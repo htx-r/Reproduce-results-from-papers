@@ -1,0 +1,328 @@
+setwd("C:/Users/kc19o338/Desktop/Johannes MI")
+load("ipd_cloz_Sen_OS_T_noHigh_vivli_MAprior2023-10-23")
+library(mitml)
+library(jomo)
+
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][9,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s_d")
+
+
+s_tau<-data.frame(s_tau=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_tau[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][10,2]^2
+}
+colnames(s_tau)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_tau)<-c("s_tau")
+
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s_b02")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s_b03")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s_b1")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s_b2")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s_b3")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][6,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s_b4")
+
+s_b5<-data.frame(s_b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b5[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][7,2]^2
+}
+colnames(s_b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b5)<-c("s_b5")
+
+s_b6<-data.frame(s_b6=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b6[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][8,2]^2
+}
+colnames(s_b6)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b6)<-c("s_b6")
+
+
+uhat1<-rbind(s_d,s_tau,s_b02, s_b03, s_b1,s_b2,s_b3,s_b4,s_b5,s_b6)
+
+
+
+d<-data.frame(d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][9,1]
+}
+colnames(d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d)<-c("d")
+
+
+tau<-data.frame(tau=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  tau[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][10,1]
+}
+colnames(tau)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(tau)<-c("tau")
+
+b02<-data.frame(b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b02[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][1,1]
+}
+colnames(b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b02)<-c("b02")
+
+b03<-data.frame(b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b03[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][2,1]
+}
+colnames(b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b03)<-c("b03")
+
+b1<-data.frame(b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b1[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][3,1]
+}
+colnames(b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b1)<-c("b1")
+
+b2<-data.frame(b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b2[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][4,1]
+}
+colnames(b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b2)<-c("b2")
+
+b3<-data.frame(b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b3[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][5,1]
+}
+colnames(b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b3)<-c("b3")
+
+b4<-data.frame(b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b4[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][6,1]
+}
+colnames(b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b4)<-c("b4")
+
+b5<-data.frame(b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b5[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][7,1]
+}
+colnames(b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b5)<-c("b5")
+
+b6<-data.frame(b6=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  b6[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][8,1]
+}
+colnames(b6)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(b6)<-c("b6")
+
+
+qhat1<-rbind(d,tau,b02, b03, b1,b2,b3,b4,b5,b6)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix)<-c("d", "tau", "Duration_ill_years_PF", "OS_T_BL_PF","Gender_EM", "Duration_Ill_year_EM", "OS_T_BL_EM","TR_AnySGA_EM","TR_Olanzapine_EM","TR_Risperidone_EM")
+
+
+low_d<-data.frame(low_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_d[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][9,3]
+}
+colnames(low_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_d)<-c("low_d")
+
+
+low_tau<-data.frame(low_tau=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_tau[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][10,3]
+}
+colnames(low_tau)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_tau)<-c("low_tau")
+
+low_b02<-data.frame(low_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b02[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][1,3]
+}
+colnames(low_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b02)<-c("low_b02")
+
+low_b03<-data.frame(low_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b03[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][2,3]
+}
+colnames(low_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b03)<-c("low_b03")
+
+low_b1<-data.frame(low_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b1[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][3,3]
+}
+colnames(low_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b1)<-c("low_b1")
+
+low_b2<-data.frame(low_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b2[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][4,3]
+}
+colnames(low_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b2)<-c("low_b2")
+
+low_b3<-data.frame(low_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b3[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][5,3]
+}
+colnames(low_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b3)<-c("low_b3")
+
+low_b4<-data.frame(low_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b4[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][6,3]
+}
+colnames(low_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b4)<-c("low_b4")
+
+low_b5<-data.frame(low_b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b5[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][7,3]
+}
+colnames(low_b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b5)<-c("low_b5")
+
+low_b6<-data.frame(low_b6=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  low_b6[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][8,3]
+}
+colnames(low_b6)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(low_b6)<-c("low_b6")
+
+
+low_hat1<-rbind(low_d,low_tau,low_b02, low_b03, low_b1,low_b2,low_b3,low_b4,low_b5,low_b6)
+Pooled_low<-testEstimates(qhat = low_hat1, uhat = uhat1, var.comp = T)
+Pooled_matrix_low<-as.data.frame(Pooled_low$estimates)
+rownames(Pooled_matrix_low)<-c("d", "tau", "Duration_ill_years_PF", "OS_T_BL_PF","Gender_EM", "Duration_Ill_year_EM", "OS_T_BL_EM","TR_AnySGA_EM","TR_Olanzapine_EM","TR_Risperidone_EM")
+low_CrI<-Pooled_matrix_low[,1]
+
+
+
+
+
+upper_d<-data.frame(upper_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_d[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][9,7]
+}
+colnames(upper_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_d)<-c("upper_d")
+
+
+upper_tau<-data.frame(upper_tau=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_tau[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][10,7]
+}
+colnames(upper_tau)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_tau)<-c("upper_tau")
+
+upper_b02<-data.frame(upper_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b02[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][1,7]
+}
+colnames(upper_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b02)<-c("upper_b02")
+
+upper_b03<-data.frame(upper_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b03[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][2,7]
+}
+colnames(upper_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b03)<-c("upper_b03")
+
+upper_b1<-data.frame(upper_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b1[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][3,7]
+}
+colnames(upper_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b1)<-c("upper_b1")
+
+upper_b2<-data.frame(upper_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b2[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][4,7]
+}
+colnames(upper_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b2)<-c("upper_b2")
+
+upper_b3<-data.frame(upper_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b3[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][5,7]
+}
+colnames(upper_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b3)<-c("upper_b3")
+
+upper_b4<-data.frame(upper_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b4[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][6,7]
+}
+colnames(upper_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b4)<-c("upper_b4")
+
+upper_b5<-data.frame(upper_b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b5[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][7,7]
+}
+colnames(upper_b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b5)<-c("upper_b5")
+
+upper_b6<-data.frame(upper_b6=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  upper_b6[1,i]<-fit_all_Sen_OS_T_noHigh_vivli_prior[[i]][8,7]
+}
+colnames(upper_b6)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(upper_b6)<-c("upper_b6")
+
+
+upper_hat1<-rbind(upper_d,upper_tau,upper_b02, upper_b03, upper_b1,upper_b2,upper_b3,upper_b4,upper_b5,upper_b6)
+Pooled_upper<-testEstimates(qhat = upper_hat1, uhat = uhat1, var.comp = T)
+Pooled_matrix_upper<-as.data.frame(Pooled_upper$estimates)
+rownames(Pooled_matrix_upper)<-c("d", "tau", "Duration_ill_years_PF", "OS_T_BL_PF","Gender_EM", "Duration_Ill_year_EM", "OS_T_BL_EM","TR_AnySGA_EM","TR_Olanzapine_EM","TR_Risperidone_EM")
+upper_CrI<-Pooled_matrix_upper[,1]
+
+Final_results<-cbind(Pooled_matrix_final,low_CrI,upper_CrI)
+rownames(Final_results)<-c("d", "tau", "Duration_ill_years_PF", "OS_T_BL_PF","Gender_EM", "Duration_Ill_year_EM", "OS_T_BL_EM","TR_Olanzapine_EM","TR_Risperidone_EM","TR_Zotepine_EM")
+
+write.csv(Final_results, "C:/Users/kc19o338/Desktop/Johannes MI/Sensitivity Analysis Excluding high ROB/Results_Sensitivity_noHighROB_vivliPriors_03102023.csv")
+write.csv(Final_results, "C:/Users/kc19o338/Desktop/Johannes MI/Results/Results_Sensitivity_noHighROB_vivliPriors_03102023.csv")

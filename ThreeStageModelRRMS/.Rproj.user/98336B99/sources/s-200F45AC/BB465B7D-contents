@@ -1,0 +1,1367 @@
+setwd("C:/Users/kc19o338/Desktop/Johannes MI")
+
+library(mitml)
+library(jomo)
+
+#### 1 Primary PM_OS_T_prior2023-09-07
+load("ipd_cloz_PM_OS_T_vivli_prior2023-10-23")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-PM_OS_T_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-PM_OS_T_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-PM_OS_T_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-PM_OS_T_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-PM_OS_T_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-PM_OS_T_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-PM_OS_T_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-PM_OS_T_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-PM_OS_T_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-PM_OS_T_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-PM_OS_T_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-PM_OS_T_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-PM_OS_T_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-PM_OS_T_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/PM_OS_T_prior2023-09-28_prior_RR.csv")
+
+
+#### 2 Primary PM_OS_T_MA_prior2023-09-07
+load("PM_OS_T_MA_prior2023-09-28")
+s_d1<-data.frame(s_d1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d1[1,i]<-PM_OS_T_MA_prior[[i]][1,2]^2
+}
+colnames(s_d1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d1)<-c("s_d")
+
+
+uhat1<-rbind(s_d1)
+
+
+d1<-data.frame(d1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d1[1,i]<-PM_OS_T_MA_prior[[i]][1,1]
+}
+colnames(d1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d1)<-c("d")
+
+qhat1<-rbind(d1)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("d")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/PM_OS_T_MA_prior2023-09-28_prior_RR.csv")
+
+
+#### 3 Primary PM_OS_T_MA_smd_prior2023-09-07
+load("PM_OS_T_MA_smd_prior2023-09-28")
+s_d1<-data.frame(s_d1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d1[1,i]<-PM_OS_T_MA_smd_prior[[i]][1,2]^2
+}
+colnames(s_d1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d1)<-c("s_d")
+
+
+uhat1<-rbind(s_d1)
+
+
+d1<-data.frame(d1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d1[1,i]<-PM_OS_T_MA_smd_prior[[i]][1,1]
+}
+colnames(d1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d1)<-c("d")
+
+qhat1<-rbind(d1)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("d")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/PM_OS_T_MA_smd_prior2023-09-28_prior_RR.csv")
+
+
+
+#### 4 Sec_DO_T_prior2023-09-07
+load("Sec_DO_T_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sec_DO_T_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sec_DO_T_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sec_DO_T_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sec_DO_T_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sec_DO_T_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sec_DO_T_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sec_DO_T_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sec_DO_T_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sec_DO_T_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sec_DO_T_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sec_DO_T_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sec_DO_T_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sec_DO_T_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sec_DO_T_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sec_DO_T_prior2023-09-28_prior_RR.csv")
+
+
+
+#### 5 Sec_N_Res_prior2023-09-07
+load("Sec_N_Res_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sec_N_Res_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sec_N_Res_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sec_N_Res_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sec_N_Res_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sec_N_Res_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sec_N_Res_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sec_N_Res_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sec_N_Res_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sec_N_Res_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sec_N_Res_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sec_N_Res_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sec_N_Res_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sec_N_Res_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sec_N_Res_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sec_N_Res_prior2023-09-28_prior_RR.csv")
+
+
+#### 6 Sec_OS_N_prior2023-09-07
+load("Sec_OS_N_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sec_OS_N_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sec_OS_N_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sec_OS_N_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sec_OS_N_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sec_OS_N_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sec_OS_N_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sec_OS_N_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sec_OS_N_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sec_OS_N_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sec_OS_N_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sec_OS_N_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sec_OS_N_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sec_OS_N_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sec_OS_N_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sec_OS_N_prior2023-09-28_prior_RR.csv")
+
+
+#### 7 Sec_OS_P_N_prior2023-09-07
+load("Sec_OS_P_N_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sec_OS_P_N_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sec_OS_P_N_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b04<-data.frame(s_b04=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b04[1,i]<-Sec_OS_P_N_prior[[i]][3,2]^2
+}
+colnames(s_b04)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b04)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sec_OS_P_N_prior[[i]][4,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sec_OS_P_N_prior[[i]][5,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sec_OS_P_N_prior[[i]][6,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sec_OS_P_N_prior[[i]][9,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_b5<-data.frame(s_b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b5[1,i]<-Sec_OS_P_N_prior[[i]][7,2]^2
+}
+colnames(s_b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b5)<-c("s")
+
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sec_OS_P_N_prior[[i]][8,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b04, s_b1, s_b2, s_b3, s_b5, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sec_OS_P_N_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sec_OS_P_N_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b04<-data.frame(d_b04=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b04[1,i]<-Sec_OS_P_N_prior[[i]][3,1]
+}
+colnames(d_b04)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b04)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sec_OS_P_N_prior[[i]][4,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sec_OS_P_N_prior[[i]][5,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sec_OS_P_N_prior[[i]][6,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b5<-data.frame(d_b5=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b5[1,i]<-Sec_OS_P_N_prior[[i]][7,1]
+}
+colnames(d_b5)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b5)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sec_OS_P_N_prior[[i]][9,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sec_OS_P_N_prior[[i]][8,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b04, d_b1, d_b2, d_b3, d_b5, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b04", "b1", "b2", "b3", "b5","d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sec_OS_P_N_prior2023-09-28_prior_RR.csv")
+
+
+#### 8 Sec_OS_P_prior2023-09-07
+load("Sec_OS_P_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sec_OS_P_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sec_OS_P_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sec_OS_P_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sec_OS_P_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sec_OS_P_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sec_OS_P_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sec_OS_P_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sec_OS_P_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sec_OS_P_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sec_OS_P_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sec_OS_P_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sec_OS_P_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sec_OS_P_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sec_OS_P_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sec_OS_P_prior2023-09-28_prior_RR.csv")
+
+
+
+#### 9 Sen_OS_T_noHigh_prior2023-09-07
+load("Sen_OS_T_noHigh_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sen_OS_T_noHigh_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sen_OS_T_noHigh_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sen_OS_T_noHigh_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sen_OS_T_noHigh_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sen_OS_T_noHigh_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sen_OS_T_noHigh_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sen_OS_T_noHigh_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sen_OS_T_noHigh_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sen_OS_T_noHigh_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sen_OS_T_noHigh_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sen_OS_T_noHigh_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sen_OS_T_noHigh_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sen_OS_T_noHigh_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sen_OS_T_noHigh_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sen_OS_T_noHigh_prior2023-09-28_prior_RR.csv")
+
+
+#### 10 Sen_OS_T_noIntolerable_prior2023-09-07
+load("Sen_OS_T_noIntolerable_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sen_OS_T_noIntolerable_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sen_OS_T_noIntolerable_prior2023-09-28_prior_RR.csv")
+
+
+#### 11 Sen_OS_T_noIntolerable_weak_prior2023-09-28
+load("Sen_OS_T_noIntolerable_weak_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sen_OS_T_noIntolerable_weak_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sen_OS_T_noIntolerable_weak_prior2023-09-28_prior_RR.csv")
+
+
+
+#### 12 Sen_OS_T_noSingle_prior
+load("Sen_OS_T_noSingle_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sen_OS_T_noSingle_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sen_OS_T_noSingle_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sen_OS_T_noSingle_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sen_OS_T_noSingle_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sen_OS_T_noSingle_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sen_OS_T_noSingle_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sen_OS_T_noSingle_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sen_OS_T_noSingle_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sen_OS_T_noSingle_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sen_OS_T_noSingle_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sen_OS_T_noSingle_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sen_OS_T_noSingle_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sen_OS_T_noSingle_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sen_OS_T_noSingle_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sen_OS_T_noSingle_prior2023-09-28_prior_RR.csv")
+
+
+
+
+#### 13 Sens_OS_long_prior2023-09-07
+load("Sens_OS_long_prior2023-09-28")
+s_b02<-data.frame(s_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b02[1,i]<-Sens_OS_long_prior[[i]][1,2]^2
+}
+colnames(s_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b02)<-c("s")
+
+s_b03<-data.frame(s_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b03[1,i]<-Sens_OS_long_prior[[i]][2,2]^2
+}
+colnames(s_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b03)<-c("s")
+
+s_b1<-data.frame(s_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b1[1,i]<-Sens_OS_long_prior[[i]][3,2]^2
+}
+colnames(s_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b1)<-c("s")
+
+s_b2<-data.frame(s_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b2[1,i]<-Sens_OS_long_prior[[i]][4,2]^2
+}
+colnames(s_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b2)<-c("s")
+
+s_b3<-data.frame(s_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b3[1,i]<-Sens_OS_long_prior[[i]][5,2]^2
+}
+colnames(s_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b3)<-c("s")
+
+s_b4<-data.frame(s_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_b4[1,i]<-Sens_OS_long_prior[[i]][7,2]^2
+}
+colnames(s_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_b4)<-c("s")
+
+s_d<-data.frame(s_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  s_d[1,i]<-Sens_OS_long_prior[[i]][6,2]^2
+}
+colnames(s_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(s_d)<-c("s")
+
+uhat1<-rbind(s_b02, s_b03, s_b1, s_b2, s_b3, s_d, s_b4)
+
+
+d_b02<-data.frame(d_b02=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b02[1,i]<-Sens_OS_long_prior[[i]][1,1]
+}
+colnames(d_b02)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b02)<-c("d")
+
+d_b03<-data.frame(d_b03=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b03[1,i]<-Sens_OS_long_prior[[i]][2,1]
+}
+colnames(d_b03)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b03)<-c("d")
+
+d_b1<-data.frame(d_b1=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b1[1,i]<-Sens_OS_long_prior[[i]][3,1]
+}
+colnames(d_b1)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b1)<-c("d")
+
+
+d_b2<-data.frame(d_b2=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b2[1,i]<-Sens_OS_long_prior[[i]][4,1]
+}
+colnames(d_b2)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b2)<-c("d")
+
+d_b3<-data.frame(d_b3=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b3[1,i]<-Sens_OS_long_prior[[i]][5,1]
+}
+colnames(d_b3)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b3)<-c("d")
+
+d_b4<-data.frame(d_b4=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_b4[1,i]<-Sens_OS_long_prior[[i]][7,1]
+}
+colnames(d_b4)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_b4)<-c("d")
+
+d_d<-data.frame(d_d=matrix(NA,nrow=1,ncol=1))
+for (i in 1:10){
+  d_d[1,i]<-Sens_OS_long_prior[[i]][6,1]
+}
+colnames(d_d)<-c("1","2","3","4","5","6","7","8","9","10")
+rownames(d_d)<-c("d")
+
+qhat1<-rbind(d_b02,d_b03, d_b1, d_b2, d_b3, d_d, d_b4)
+
+
+Pooled<-testEstimates(qhat = qhat1, uhat = uhat1, var.comp = T)
+Pooled_matrix<-as.data.frame(Pooled$estimates)
+Pooled_matrix_final<-Pooled_matrix[,c(1,2)]
+rownames(Pooled_matrix_final)<-c("b02", "b03", "b1", "b2", "b3", "d", "b4")
+
+write.csv(Pooled_matrix_final, "C:/Users/kc19o338/Desktop/Johannes MI/Vivli Priors _ RubinsRules/Sens_OS_long_prior2023-09-28_prior_RR.csv")
+
+

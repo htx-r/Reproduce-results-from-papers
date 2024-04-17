@@ -1,0 +1,183 @@
+
+### load the needed libraries
+library(haven)
+library(ggplot2)
+library(dplyr)
+library(rms)
+
+#read the dta data
+leprosy_data<-read_dta("C:/Users/kc19o338/Desktop/ctu/Biostatistician Exercise/chilumba.dta")
+
+
+######################### Step 1. Exploration of data #######################################
+#a. all variables are categorical - change them to factors
+leprosy_data$sex<-as.factor(leprosy_data$sex)
+leprosy_data$caco<-as.factor(leprosy_data$caco)
+leprosy_data$agegrp<-as.factor(leprosy_data$agegrp)
+leprosy_data$bcgscar<-as.factor(leprosy_data$bcgscar)
+leprosy_data$school<-as.factor(leprosy_data$school)
+leprosy_data$mbcont<-as.factor(leprosy_data$mbcont)
+leprosy_data$pbcont<-as.factor(leprosy_data$pbcont)
+
+#plot for cases per sex - more women in cases
+mytable <- table(leprosy_data$caco, leprosy_data$sex)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "Sex", "Proportion")
+myplot <- ggplot(data = myproptable)
+csex<-myplot + geom_col(aes(x = Case, y = Proportion, fill = Sex),
+                  position = position_dodge(width = 0.9),
+                  alpha = 0.8) +
+  labs(title = "Sex and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+#plot for cases per school - more percentage of school category 1 in cases, less in 3 and 4
+mytable <- table(leprosy_data$caco, leprosy_data$school)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "School", "Proportion")
+myplot <- ggplot(data = myproptable)
+cschool<-myplot + geom_col(aes(x = Case, y = Proportion, fill = School),
+                        position = position_dodge(width = 0.9),
+                        alpha = 0.8) +
+  labs(title = "School and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per age - more percentage of people >=30 in cases
+mytable <- table(leprosy_data$caco, leprosy_data$agegrp)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "AgeGroup", "Proportion")
+myplot <- ggplot(data = myproptable)
+cage<-myplot + geom_col(aes(x = Case, y = Proportion, fill = AgeGroup),
+                           position = position_dodge(width = 0.9),
+                           alpha = 0.8) +
+  labs(title = "Age group and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per BCG scar - less percentage of BCG yes in cases
+mytable <- table(leprosy_data$caco, leprosy_data$bcgscar)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "BCG", "Proportion")
+myplot <- ggplot(data = myproptable)
+cbcg<-myplot + geom_col(aes(x = Case, y = Proportion, fill = BCG),
+                        position = position_dodge(width = 0.9),
+                        alpha = 0.8) +
+  labs(title = "BCG scar and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per household contact with multibacillary case  - more percentage of mbcont in cases
+mytable <- table(leprosy_data$caco, leprosy_data$mbcont)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "Mbcont", "Proportion")
+myplot <- ggplot(data = myproptable)
+cmb<-myplot + geom_col(aes(x = Case, y = Proportion, fill = Mbcont),
+                        position = position_dodge(width = 0.9),
+                        alpha = 0.8) +
+  labs(title = "Multibacillary contact and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+
+#plot for cases per household contact with paucibacillary case  - more percentage of pbcont in cases
+mytable <- table(leprosy_data$caco, leprosy_data$pbcont)
+myproptable<-prop.table(mytable, margin = 1)
+myproptable<-as.data.frame(myproptable)
+names(myproptable) <- c("Case", "pbcont", "Proportion")
+myplot <- ggplot(data = myproptable)
+cpb<-myplot + geom_col(aes(x = Case, y = Proportion, fill = pbcont),
+                       position = position_dodge(width = 0.9),
+                       alpha = 0.8) +
+  labs(title = "Paucibacillary contact and case status",
+       x = "Case Status",
+       y = "Proportion or Percentage")
+#Final plot
+ggarrange(csex,cage,cschool,cbcg,cmb,cpb,ncol=3,nrow=3)
+
+#create a new school variable - combine category 4 with category 3 in school variable (cell with scarce data)
+leprosy_data$school_comb<-leprosy_data$school
+leprosy_data$school_comb[leprosy_data$school_comb==4]<-3
+leprosy_data$school_comb<-as.factor(leprosy_data$school_comb)
+
+#create a new variable - combine mbcont and pbcont categories
+leprosy_data$lep_contact<-NA
+leprosy_data$lep_contact[leprosy_data$mbcont==1 | leprosy_data$pbcont==1 ]<-1
+leprosy_data$lep_contact[leprosy_data$mbcont==0 & leprosy_data$pbcont==0 ]<-0
+
+######################### Step 2. Generate a new age and school variable ####################
+############### where you assign each category a sensible numeric value.  #######################################
+
+#change of school variable to a sensible numerical variable
+leprosy_data$school_num[leprosy_data$school==1]<-0
+leprosy_data$school_num[leprosy_data$school==2]<-(1+5)/2
+leprosy_data$school_num[leprosy_data$school==3]<-(6+8)/2
+leprosy_data$school_num[leprosy_data$school==4]<-(9+17)/2
+#change of age variable to a sensible numerical variable
+leprosy_data$age_num[leprosy_data$agegrp==1]<-(5+9)/2
+leprosy_data$age_num[leprosy_data$agegrp==2]<-(10+15)/2
+leprosy_data$age_num[leprosy_data$agegrp==3]<-(15+19)/2
+leprosy_data$age_num[leprosy_data$agegrp==4]<-(20+29)/2
+leprosy_data$age_num[leprosy_data$agegrp==5]<-(30+70)/2
+
+dd <- datadist(leprosy_data)
+ options(datadist="dd")
+
+######################### Step 3. crude association of BCG with leprosy ####################
+#run the model
+model<-lrm(caco~bcgscar,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model
+#obtain the 95% confidence intervals
+coef <- coef(model)
+se <- sqrt(diag(vcov(model)))
+z <- qnorm(0.975) # 95% confidence level
+lower <- coef - z*se
+upper <- coef + z*se
+results <- data.frame(coef = coef, lower = lower, upper = upper)
+##results in ORs scale
+exp(results)
+
+######################### Step 4. Model fit comparison for categorical and numerical variables ####################
+#for age - keep age as numerical
+model1_age<-lrm(caco~bcgscar*age_num,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model2_age<-lrm(caco~bcgscar*agegrp,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+AIC(model1_age)
+AIC(model2_age)
+BIC(model1_age)
+BIC(model2_age)
+#for school
+leprosy_data$school_comb<-droplevels(leprosy_data$school_comb)
+model1_school<-lrm(caco~bcgscar*school,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model2_school<-lrm(caco~bcgscar*school_comb,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model3_school<-lrm(caco~bcgscar*school_num,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+
+AIC(model1_school)
+AIC(model2_school)
+AIC(model3_school)
+BIC(model1_school)
+BIC(model2_school)
+BIC(model3_school)
+#for leprosy contact
+model1_lepcontact<-lrm(caco~bcgscar*lep_contact,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+model2_lepcontact<-lrm(caco~bcgscar*pbcont+bcgscar*mbcont,x=TRUE,y=TRUE,linear.predictors = TRUE,data=leprosy_data)
+AIC(model1_lepcontact)
+AIC(model2_lepcontact)
+BIC(model1_lepcontact)
+BIC(model2_lepcontact)
+
+######################### Step 5. Final model ####################
+final_model<-lrm(caco~bcgscar*age_num+bcgscar*sex+bcgscar*school_num+bcgscar*lep_contact,data=leprosy_data)
+final_model
+coef <- coef(final_model)
+se <- sqrt(diag(vcov(final_model)))
+z <- qnorm(0.975) # 95% confidence level
+lower <- coef - z*se
+upper <- coef + z*se
+final_results <- data.frame(coef = coef, lower = lower, upper = upper)
+##results in ORs scale
+exp(final_results)
+
+

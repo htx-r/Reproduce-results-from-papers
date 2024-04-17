@@ -1,0 +1,24 @@
+{
+    "id": "689005A1",
+    "path": "C:/Users/kc19o338/Desktop/Johannes MI/Sensitivity Analysis Excluding Intolerable patients/Rubins_rules_noIntolerablePatients_vivliPriors.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "1694049648",
+    "contents": "",
+    "dirty": false,
+    "created": 1698254961631.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "cursorPosition": "326,23",
+        "scrollLine": "324"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1698254976,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1698254976880,
+    "read_only": false,
+    "read_only_alternatives": []
+}

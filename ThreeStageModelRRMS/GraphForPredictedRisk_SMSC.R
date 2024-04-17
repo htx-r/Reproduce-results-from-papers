@@ -52,6 +52,17 @@ colnames(PlL)<-c("Risknew","prelapse","lowCI", "highCI","Treatment")
 ##merge data for all the treatments
 GraphdataL<-rbind(DFL,GAL,NL,PlL)
 
+
+write.xlsx(GraphdataL,"C:/Users/kc19o338/Documents/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/Results/GraphData_SMSC.xls",row.names = F)
+GraphdataF<-read_excel("C:/Users/kc19o338/Documents/GitHub/Reproduce-results-from-papers/ThreeStageModelRRMS/Results/GraphData_SMSC.xls")
+Graphdata1<-GraphdataF[,5]
+Graphdata2<-GraphdataF[,2]
+Graphdata3<-GraphdataF[,1]
+Graphdata<-cbind(Graphdata1,Graphdata2,Graphdata3)
+colnames(Graphdata)<-c("Treatment", "Predicted probability to relapse within the next 2 years %", "Baseline risk score")
+Graphdata$Treatment[Graphdata$Treatment=="Placebo"]<-"Untreated"
+write.csv(Graphdata,"GraphData_SMSC.csv",row.names = F)
+
 #Graphdata_SMSC<-GraphdataL[,c(1,2,5)]
 #colnames(Graphdata_SMSC)<-c( "Baseline risk","Predicted probability of relapsing within the next two years %","Treatment")
 #Graphdata_SMSC$Treatment<-as.factor(Graphdata_SMSC$Treatment)
